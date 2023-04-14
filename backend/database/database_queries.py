@@ -1,6 +1,7 @@
 from database.connection import get_connection
 
 
+
 def read_query(sql: str, sql_params=()):
     with get_connection() as conn:
         cursor = conn.cursor()

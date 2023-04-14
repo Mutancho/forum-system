@@ -1,11 +1,13 @@
-from backend.database.database_queries import read_query
-from backend.schemas.category import Category
+from database.database_queries import read_query, insert_query
+from schemas.category import Category
 
 
 def get_all():
-    data = read_query("SELECT id, name FROM forumproject.category")
-    return (Category(id=id, name=name) for id, name in data)
+    query = read_query("SELECT id, name FROM category")
+    return [Category(id=id, name=name) for id, name in query]
 
 
-def get_all_with_topics():
-    pass
+def create(category: Category):
+    generated_id = insert_query("INSERT INTO category (name) VALUES (?)", (category.name,))
+    category.id = generated_id
+    return category
