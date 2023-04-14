@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
-from services.category_service import get_all, create
+from services.category_service import get_all, create, update, delete
+from services.validations import UpdateStatus
 from schemas.category import Category
 
 router_category = APIRouter(prefix="/categories", tags=["Categories"])
@@ -30,6 +31,10 @@ def get_categories(search: str | None = None,
     return data
 
 
+@router_category.get("/{category_id}")
+def get_category_by_id(category_id: int, category: Category):
+    pass
+
 
 @router_category.get("/topics")
 def get_categories_with_topics():
@@ -42,3 +47,21 @@ def create_category(category: Category):
     if created_category is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to create category")
     return category
+
+
+@router_category.put("/{category_id}")
+def update_category(category_id: int, category: Category):
+    update_status = update(category_id, category)
+
+    if update_status == UpdateStatus.NOT_FOUND:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+
+    if update_status == UpdateStatus.SAME_NAME:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Category name is already the same")
+
+    return category
+
+
+@router_category.put("/{category_id}")
+def delete_category(category_id: int):
+    pass
