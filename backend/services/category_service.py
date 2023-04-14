@@ -29,8 +29,9 @@ def update(category_id: int, category: Category) -> UpdateStatus:
     return UpdateStatus.SUCCESS
 
 
-def delete():
-    pass
+def delete(category_id: int) -> bool:
+    deleted_rows = update_query("DELETE FROM category WHERE id = ?", (category_id,))
+    return deleted_rows > 0
 
 
 def _get_category_by_id(category_id: int) -> Category | None:

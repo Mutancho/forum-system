@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Response
 from services.category_service import get_all, create, update, delete
 from services.validations import UpdateStatus
 from schemas.category import Category
@@ -62,6 +62,11 @@ def update_category(category_id: int, category: Category):
     return category
 
 
-@router_category.put("/{category_id}")
+@router_category.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_category(category_id: int):
-    pass
+    deleted = delete(category_id)
+
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+
+    Response(status_code=status.HTTP_204_NO_CONTENT)
