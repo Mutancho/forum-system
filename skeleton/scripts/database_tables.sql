@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`user` (
   `password` VARCHAR(255) NOT NULL,
   `role` VARCHAR(255) NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `username` (`username` ASC) ,
   UNIQUE INDEX `email` (`email` ASC) )
@@ -74,6 +75,7 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`message` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `content` TEXT NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `sender_id` INT(11) NOT NULL,
   `receiver_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -96,8 +98,8 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`topic` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(255) NOT NULL,
   `content` TEXT NOT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
-  `updated_at` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` INT(11) NULL,
   `category_id` INT(11) NOT NULL,
   `locked` TINYINT(1) NOT NULL DEFAULT '0',
@@ -129,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`reply` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `content` TEXT NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
-  `updated_at` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` INT(11) NOT NULL,
   `topic_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
@@ -155,6 +157,7 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`replyvote` (
   `reply_id` INT(11) NOT NULL,
   `vote_type` ENUM('upvote', 'downvote') NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `reply_id` (`reply_id` ASC) ,
@@ -164,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`replyvote` (
     REFERENCES `forumproject`.`reply` (`id`)
     ON DELETE CASCADE,
   CONSTRAINT `fk_replyvote_user1`
-    FOREIGN KEY (`user_id`)
+  FOREIGN KEY (`user_id`)
     REFERENCES `forumproject`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
