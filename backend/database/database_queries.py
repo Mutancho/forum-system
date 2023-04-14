@@ -1,4 +1,4 @@
-from backend.database.connection import get_connection
+from database.connection import get_connection
 
 
 def read_query(sql: str, sql_params=()):

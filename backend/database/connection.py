@@ -1,6 +1,6 @@
 from mariadb import connect, Error
 from mariadb.connections import Connection
-from backend.config.config import settings
+from config.config import settings
 
 
 def get_connection() -> Connection:
