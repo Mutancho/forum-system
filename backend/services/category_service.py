@@ -24,24 +24,44 @@ def create(category: Category):
     return category
 
 
-def update(category_id: int, category: Category) -> UpdateStatus:
-    existing_category = _get_category_by_id(category_id)
-
-    if not existing_category:
-        return UpdateStatus.NOT_FOUND
-
-    if _check_duplicate_name(category_id, category.name):
-        return UpdateStatus.SAME_NAME
-
-    update_query("UPDATE category SET name = ? WHERE id = ?", (category.name, category_id))
-
-    category.id = category_id
-    return UpdateStatus.SUCCESS
-
-
 def delete(category_id: int) -> bool:
     deleted_rows = update_query("DELETE FROM category WHERE id = ?", (category_id,))
     return deleted_rows > 0
+
+
+def update(category_id: int, category: Category) -> UpdateStatus:
+    updated_rows = update_query("UPDATE category SET name = ? WHERE id = ?", (category.name, category_id))
+    return _update_helper(updated_rows, category_id)
+
+
+def lock(category_id: int) -> UpdateStatus | None:
+    updated_row = update_query("UPDATE category SET locked = 1 WHERE id = ?", (category_id,))
+    return _update_helper(updated_row, category_id)
+
+
+def unlock(category_id: int) -> UpdateStatus:
+    updated_row = update_query("UPDATE category SET locked = 0 WHERE id = ?", (category_id,))
+    return _update_helper(updated_row, category_id)
+
+
+def make_private(category_id: int) -> UpdateStatus:
+    updated_row = update_query("UPDATE category SET is_private = 1 WHERE id = ?", (category_id,))
+    return _update_helper(updated_row, category_id)
+
+
+def make_non_private(category_id):
+    updated_row = update_query("UPDATE category SET is_private = 0 WHERE id = ?", (category_id,))
+    return _update_helper(updated_row, category_id)
+
+
+def _update_helper(updated_rows: int, category_id: int) -> UpdateStatus:
+    if updated_rows == 0:
+        category = _get_category_by_id(category_id)
+        if category is None:
+            return UpdateStatus.NOT_FOUND
+        else:
+            return UpdateStatus.NO_CHANGE
+    return UpdateStatus.SUCCESS
 
 
 def _get_category_by_id(category_id: int) -> Category | None:

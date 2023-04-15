@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`topic` (
   `user_id` INT(11) NULL,
   `category_id` INT(11) NOT NULL,
   `locked` TINYINT(1) NOT NULL DEFAULT '0',
-  `best_reply_id` INT(11) NOT NULL,
+  `best_reply_id` INT(11),
   PRIMARY KEY (`id`),
   INDEX `user_id` (`user_id` ASC) ,
   INDEX `category_id` (`category_id` ASC) ,

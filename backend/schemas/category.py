@@ -10,3 +10,6 @@ class Category(BaseModel):
 class CategoryWithTopics(BaseModel):
     category: Category
     topics: list[BaseTopic]
+
+
+
