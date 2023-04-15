@@ -1,11 +1,21 @@
 from database.database_queries import read_query, insert_query, update_query
-from schemas.category import Category
+from schemas.category import Category, CategoryWithTopics
+from schemas.topic import BaseTopic
 from services.validations import UpdateStatus
 
 
 def get_all():
     query = read_query("SELECT id, name FROM category")
     return [Category(id=id, name=name) for id, name in query]
+
+
+def get_category_by_id_with_topics(category_id: int) -> CategoryWithTopics | None:
+    category_data = _get_category_by_id(category_id)
+    if not category_data:
+        return None
+    topic_data = read_query("SELECT id, title, content FROM topic WHERE category_id = ?", (category_id,))
+    topics = [BaseTopic(id=id, title=title, content=content) for id, title, content in topic_data]
+    return CategoryWithTopics(category=category_data, topics=topics)
 
 
 def create(category: Category):

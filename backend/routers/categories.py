@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, HTTPException, Response
-from services.category_service import get_all, create, update, delete
+from services.category_service import get_all, create, update, delete,get_category_by_id_with_topics
 from services.validations import UpdateStatus
 from schemas.category import Category
 
@@ -32,8 +32,13 @@ def get_categories(search: str | None = None,
 
 
 @router_category.get("/{category_id}")
-def get_category_by_id(category_id: int, category: Category):
-    pass
+def get_category_by_id(category_id: int):
+    category_with_topics = get_category_by_id_with_topics(category_id)
+
+    if not category_with_topics:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+
+    return category_with_topics
 
 
 @router_category.get("/topics")
