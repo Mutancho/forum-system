@@ -11,8 +11,9 @@ def create_user(user: User):
 
     return user_service.create(user)
 
-@user_router.delete('/{id}',status_code=204)
+@user_router.delete('/{id}')
 def delete_user(id:int):
     if not user_service.exists_by_id(id):
         return Response(status_code=404)
-    return Response(status_code=204,content='User deleted.')
+    user_service.delete(id)
+    return Response(status_code=204)
