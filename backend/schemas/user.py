@@ -21,3 +21,11 @@ class DisplayUser(BaseModel):
     @classmethod
     def from_query_result(cls, id, username, email, password, role, created_at):
         return cls(id=id, username=username, email=email)
+
+class UsernameLogin(BaseModel):
+    username: str
+    password: str
+
+class EmailLogin(BaseModel):
+    email: constr(regex='([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+    password: str
