@@ -1,5 +1,5 @@
 from database.database_queries import read_query, insert_query, update_query
-from schemas.category import Category, CategoryWithTopics
+from schemas.category import Category, CategoryWithTopics, PrivilegedCategoryUsers
 from schemas.topic import BaseTopic
 from services.validations import UpdateStatus
 
@@ -35,23 +35,30 @@ def update(category_id: int, category: Category) -> UpdateStatus:
 
 
 def lock(category_id: int) -> UpdateStatus | None:
-    updated_row = update_query("UPDATE category SET locked = 1 WHERE id = ?", (category_id,))
-    return _update_helper(updated_row, category_id)
+    updated_rows = update_query("UPDATE category SET locked = 1 WHERE id = ?", (category_id,))
+    return _update_helper(updated_rows, category_id)
 
 
 def unlock(category_id: int) -> UpdateStatus:
-    updated_row = update_query("UPDATE category SET locked = 0 WHERE id = ?", (category_id,))
-    return _update_helper(updated_row, category_id)
+    updated_rows = update_query("UPDATE category SET locked = 0 WHERE id = ?", (category_id,))
+    return _update_helper(updated_rows, category_id)
 
 
 def make_private(category_id: int) -> UpdateStatus:
-    updated_row = update_query("UPDATE category SET is_private = 1 WHERE id = ?", (category_id,))
-    return _update_helper(updated_row, category_id)
+    updated_rows = update_query("UPDATE category SET is_private = 1 WHERE id = ?", (category_id,))
+    return _update_helper(updated_rows, category_id)
 
 
-def make_non_private(category_id):
-    updated_row = update_query("UPDATE category SET is_private = 0 WHERE id = ?", (category_id,))
-    return _update_helper(updated_row, category_id)
+def make_non_private(category_id: int):
+    updated_rows = update_query("UPDATE category SET is_private = 0 WHERE id = ?", (category_id,))
+    return _update_helper(updated_rows, category_id)
+
+
+def view_privileged_users(category_id: int):
+    privileged_users = read_query("SELECT user_id, read_access, write_access from categorymember where category_id =?",
+                                  (category_id,))
+    return [PrivilegedCategoryUsers(user_id=user_id, read_access=read_access, write_access=write_access) for
+            user_id, read_access, write_access in privileged_users]
 
 
 def _update_helper(updated_rows: int, category_id: int) -> UpdateStatus:
