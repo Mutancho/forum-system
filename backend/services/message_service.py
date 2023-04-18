@@ -2,6 +2,7 @@ import datetime
 from schemas.message import Message
 from database.database_queries import insert_query, read_query, update_query
 from schemas.user import User,DisplayUser
+from utils import oauth2
 
 
 def create(message: Message):
@@ -12,15 +13,18 @@ def create(message: Message):
 
     return message
 
-def get_all_my_conversations(id:int)->list[DisplayUser]:
+def get_all_my_conversations(token:str)->list[DisplayUser]:
+    id = oauth2.get_current_user(token)
     data = read_query('''SELECT receiver_id FROM message WHERE sender_id = ? ''',(id,))
+    data += read_query('''SELECT sender_id FROM message WHERE receiver_id  = ? ''', (id,))
     ids = ','.join(str(id[0]) for id in set(data))
 
     users = read_query(f'''SELECT * FROM user WHERE id in ({ids})''')
 
     return (DisplayUser.from_query_result(*u) for u in users)
 
-def get_all_my_conversations_with(auth_user_id:int,receiver_id:int):#The formating needs to be fixed so JSON displayes it as intended
+def get_all_my_conversations_with(token:str,receiver_id:int):#The formating needs to be fixed so JSON displayes it as intended
+    auth_user_id = oauth2.get_current_user(token)
     data = read_query('''SELECT sender_id,content,created_at,receiver_id FROM message WHERE (sender_id=? and receiver_id = ?) or 
     (receiver_id = ? and sender_id = ?) ORDER BY created_at''',(auth_user_id,receiver_id,auth_user_id,receiver_id))
     converstion = ''
@@ -29,7 +33,7 @@ def get_all_my_conversations_with(auth_user_id:int,receiver_id:int):#The formati
             converstion+= msg[1]+f' -{msg[2]}'+'\n'
         else:
             converstion += '   '+msg[1] +f' -{msg[2]}'+ '\n'
-    # print(converstion)
+
     return converstion
 
 
