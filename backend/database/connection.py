@@ -9,7 +9,7 @@ def get_connection() -> Connection:
             user=settings.database_username,
             password=settings.database_password,
             host=settings.database_hostname,
-            port=int(settings.database_port),
+            port=settings.database_port,
             database=settings.database_name
         )
         return connection
