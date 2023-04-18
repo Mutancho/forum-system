@@ -79,6 +79,7 @@ def _get_category_by_id(category_id: int) -> Category | None:
 
 
 def _check_duplicate_name(category_id: int, new_name: str) -> bool:
+    # todo: double check if used
     data = read_query("SELECT name FROM category WHERE id = ?", (category_id,))
     if not data:
         return False

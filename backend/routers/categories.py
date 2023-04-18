@@ -2,34 +2,16 @@ from fastapi import APIRouter, status, HTTPException
 from services.category_service import (get_all, create, update, delete, get_category_by_id_with_topics,
                                        lock, unlock, make_private, make_non_private, view_privileged_users)
 from schemas.category import Category
-from routers.helper_functions import handle_category_updates
+from routers.helper_functions import handle_updates, query_filters, CATEGORY
 
 router_category = APIRouter(prefix="/categories", tags=["Categories"])
 
 
 @router_category.get("/")
-def get_categories(search: str | None = None,
-                   sort: str | None = None,
-                   skip: int | None = None,
-                   limit: int | None = None):
+def get_categories(search: str | None = None, sort: str | None = None,
+                   skip: int | None = None, limit: int | None = None):
     data = get_all()
-    if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-
-    if search:
-        data = [item for item in data if search.lower() in item.name.lower()]
-
-    if sort and (sort.lower().startswith("asc") or sort.lower().startswith("desc")):
-        reverse = sort.lower().startswith("desc")
-        data.sort(key=lambda x: x.name.lower(), reverse=reverse)
-
-    if skip:
-        data = data[skip:]
-
-    if limit:
-        data = data[:limit]
-
-    return data
+    return query_filters(data, key="name", search=search, sort=sort, skip=skip, limit=limit)
 
 
 @router_category.get("/{category_id}")
@@ -66,28 +48,28 @@ def delete_category(category_id: int):
 @router_category.put("/{category_id}")
 def update_category(category_id: int, category: Category):
     update_status = update(category_id, category)
-    return handle_category_updates(update_status)
+    return handle_updates(update_status, CATEGORY)
 
 
 @router_category.put("/lock/{category_id}")
 def lock_category(category_id: int):
     update_status = lock(category_id)
-    return handle_category_updates(update_status)
+    return handle_updates(update_status, CATEGORY)
 
 
 @router_category.put("/unlock/{category_id}")
 def unlock_category(category_id: int):
     update_status = unlock(category_id)
-    return handle_category_updates(update_status)
+    return handle_updates(update_status, CATEGORY)
 
 
 @router_category.put("/private/{category_id}")
 def make_category_private(category_id: int):
     update_status = make_private(category_id)
-    return handle_category_updates(update_status)
+    return handle_updates(update_status, CATEGORY)
 
 
 @router_category.put("/non_private/{category_id}")
 def make_category_non_private(category_id: int):
     update_status = make_non_private(category_id)
-    return handle_category_updates(update_status)
+    return handle_updates(update_status, CATEGORY)
