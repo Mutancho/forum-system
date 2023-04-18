@@ -12,4 +12,8 @@ class CategoryWithTopics(BaseModel):
     topics: list[BaseTopic]
 
 
+class PrivilegedCategoryUsers(BaseModel):
+    user_id: int
+    read_access: bool
+    write_access: bool
 

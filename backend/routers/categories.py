@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 from services.category_service import (get_all, create, update, delete, get_category_by_id_with_topics,
-                                       lock, unlock, make_private, make_non_private)
+                                       lock, unlock, make_private, make_non_private, view_privileged_users)
 from schemas.category import Category
 from routers.helper_functions import handle_category_updates
 
@@ -38,6 +38,14 @@ def get_category_by_id(category_id: int):
     if not category_with_topics:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
     return category_with_topics
+
+
+@router_category.get("/{category_id}/privileged_users")
+def get_privileged_users(category_id: int):
+    privileged_users = view_privileged_users(category_id)
+    if not privileged_users:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+    return privileged_users
 
 
 @router_category.post("/", status_code=status.HTTP_201_CREATED)
