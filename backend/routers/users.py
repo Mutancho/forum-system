@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response
-from schemas.user import User
+from schemas.user import User,EmailLogin,UsernameLogin
 from services import user_service
 
 router_user = APIRouter(prefix='/users',tags=['Users'])
@@ -17,3 +17,11 @@ def delete_user(id:int):
         return Response(status_code=404)
     user_service.delete(id)
     return Response(status_code=204)
+
+@router_user.post('/login')
+def login(credentials: EmailLogin | UsernameLogin):
+    if isinstance(credentials,EmailLogin):
+        return user_service.email_login(credentials)
+    if isinstance(credentials,UsernameLogin):
+        return user_service.username_login(credentials)
+
