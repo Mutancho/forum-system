@@ -1,11 +1,10 @@
 from datetime import date
 from pydantic import BaseModel,constr
-
 class User(BaseModel):
     id: int | None
     username: str
     email: constr(regex='([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-    password: str
+    password: constr(min_length=6)
     role: str
     created_at: date | None
 

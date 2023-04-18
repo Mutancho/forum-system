@@ -32,35 +32,37 @@ def exists_by_id(id:int):
 
     return len(data) > 0
 
-def email_login(credentials:EmailLogin):
-    data = read_query('''SELECT username,email,password FROM user WHERE email = ?''',
-                      (credentials.email,))
-    if len(data) == 0:
-        return Response(status_code=400,content=f"User with this email: {credentials.email} doesn't exist!")
+def login(credentials: EmailLogin | UsernameLogin):
+    if isinstance(credentials, EmailLogin):
+        data = read_query('''SELECT username,email,password FROM user WHERE email = ?''',
+                          (credentials.email,))
+    if isinstance(credentials, UsernameLogin):
+        data = read_query('''SELECT username,email,password FROM user WHERE username = ?''',
+                          (credentials.username,))
     username = data[0][0]
     email = data[0][1]
     password=credentials.password
-    if not valid_password(username,email,password):
-        return Response(status_code=400,content='Invalid password.')
-    return Response(status_code=200)
-def username_login(credentials: UsernameLogin):
-    data = read_query('''SELECT username,email,password FROM user WHERE username = ?''',
-                      (credentials.username,))
-    if len(data) == 0:
-        return Response(status_code=400,content=f"User with this username: {credentials.username} doesn't exist!")
-    username = data[0][0]
-    email = data[0][1]
-    password=credentials.password
-    if not valid_password(username,email,password):
-        return Response(status_code=400,content='Invalid password.')
-    return Response(status_code=200)
+
+    return Response(status_code=200)#returns a token
+
+def verify_credentials(credentials: EmailLogin | UsernameLogin):
+    if isinstance(credentials,EmailLogin):
+        data = read_query('''SELECT username,email,password FROM user WHERE email = ?''',
+                          (credentials.email,))
+    if isinstance(credentials,UsernameLogin):
+        data = read_query('''SELECT username,email,password FROM user WHERE username = ?''',
+                          (credentials.username,))
+    return len(data)>0
 
 def _hash_password(password: str):
     salt = b'$2b$12$V0NmXBYEU2o0x3nbxOPouu'
     return bcrypt.hashpw(password.encode('utf-8'), salt)
 
-def valid_password(username: str,email: str,password: str):
-    hashed = _hash_password(password)
-    actual_password = read_query('''SELECT password FROM user WHERE username = ? and email = ?''',(username,email))[0][0]
+def valid_password(credentials: EmailLogin | UsernameLogin):
+    hashed = _hash_password(credentials.password)
+    if isinstance(credentials,EmailLogin):
+        actual_password = read_query('''SELECT password FROM user WHERE username = ? and email = ?''',(credentials.email,))[0][0]
+    if isinstance(credentials,UsernameLogin):
+        actual_password = read_query('''SELECT password FROM user WHERE username = ? and email = ?''',(credentials.username,))[0][0]
 
     return hashed.decode() == actual_password

@@ -20,8 +20,13 @@ def delete_user(id:int):
 
 @router_user.post('/login')
 def login(credentials: EmailLogin | UsernameLogin):
-    if isinstance(credentials,EmailLogin):
-        return user_service.email_login(credentials)
-    if isinstance(credentials,UsernameLogin):
-        return user_service.username_login(credentials)
+    if not user_service.verify_credentials(credentials):
+        if isinstance(credentials, EmailLogin):
+            return Response(status_code=401,content=f"User with this email: {credentials.email} doesn't exist!")
+        if isinstance(credentials, UsernameLogin):
+            return Response(status_code=401,content=f"User with this username: {credentials.username} doesn't exist!")
+    if not user_service.valid_password(credentials):
+        return Response(status_code=401,content='Invalid password.')
+
+    return user_service.login(credentials)
 
