@@ -27,15 +27,11 @@ def get_all_my_conversations_with(token:str,receiver_id:int):#The formating need
     auth_user_id = oauth2.get_current_user(token)
     data = read_query('''SELECT sender_id,content,created_at,receiver_id FROM message WHERE (sender_id=? and receiver_id = ?) or 
     (receiver_id = ? and sender_id = ?) ORDER BY created_at''',(auth_user_id,receiver_id,auth_user_id,receiver_id))
-    converstion = ''
+    converstion = {}
     for msg in data:
         if msg[0]== auth_user_id:
-            converstion+= msg[1]+f' -{msg[2]}'+'\n'
+            converstion[msg[2].strftime("%m/%d/%Y, %H:%M:%S")]= msg[1]
         else:
-            converstion += '   '+msg[1] +f' -{msg[2]}'+ '\n'
+            converstion[msg[2].strftime("%m/%d/%Y, %H:%M:%S")] = '         '+msg[1]
 
     return converstion
-
-
-
-
