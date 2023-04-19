@@ -13,6 +13,19 @@ def create_user(user: User):
 
     return user_service.create(user)
 
+@router_user.put('/{id}')
+def update_user(id: int,user: User,Authorization:str = Header()):
+    token = Authorization[8:-1]
+    auth_user_id = oauth2.get_current_user(token)
+    if not user_service.exists_by_id(id):
+        return Response(status_code=404)
+    if id != auth_user_id:
+        return Response(status_code=403)
+    if user_service.exists_by_username_email(user):
+        return Response(status_code= 400, content=f'A User with this username: {user.username} and email: {user.email} already exists!')
+
+    return user_service.update_query(id,user)
+
 @router_user.delete('/{id}')
 def delete_user(id:int,Authorization:str = Header()):
     token = Authorization[8:-1]

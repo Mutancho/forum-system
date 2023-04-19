@@ -16,12 +16,19 @@ def create(user: User):
     user.created_at = read_query('''SELECT created_at FROM user WHERE id = ?''',(generate_id,))[0][0]
     return user
 
+def update(id: int,user: User):
+    password = _hash_password(user.password)
+    update_query('''UPADTE user SET username = ?, email = ? , password = ? WHERE id = ?  ''',
+                 (user.username,user.email,password,id))
+    user.id = id
+    return user
+
 def delete(id:int):
     data = update_query('''DELETE FROM user WHERE id = ?''',(id,))
 
 
 def exists_by_username_email(user: User):
-    data = read_query('''SELECT username,email FROM user WHERE username =? and email = ?''',
+    data = read_query('''SELECT username,email FROM user WHERE username =? or email = ?''',
                       (user.username, user.email))
 
     return len(data) > 0
@@ -53,7 +60,7 @@ def give_access(member_access: Member):
         update_query('''UPDATE categorymember SET read_access = ?,write_access = ?  Where user_id = ? and category_id = ?''',
                      (read_access,write_access,member_access.user_id,member_access.category_id))
     else:
-        update_query('''INSERT INTO categorymember(user_id,category_id,read_access,write_access) VALUES (?,?,?,?)''',
+        insert_query('''INSERT INTO categorymember(user_id,category_id,read_access,write_access) VALUES (?,?,?,?)''',
                      (member_access.user_id,member_access.category_id,read_access,write_access))
 
 def revoke_access(member_access: RevokeMemberAccess):
