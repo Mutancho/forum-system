@@ -1,6 +1,6 @@
 import datetime
 from utils import oauth2
-from schemas.user import User, EmailLogin, UsernameLogin, Member
+from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess
 from database.database_queries import insert_query, read_query, update_query
 import bcrypt
 
@@ -55,6 +55,13 @@ def give_access(member_access: Member):
     else:
         update_query('''INSERT INTO categorymember(user_id,category_id,read_access,write_access) VALUES (?,?,?,?)''',
                      (member_access.user_id,member_access.category_id,read_access,write_access))
+
+def revoke_access(member_access: RevokeMemberAccess):
+    read_access = 0
+    write_access = 0
+    update_query(
+        '''UPDATE categorymember SET read_access = ?,write_access = ?  Where user_id = ? and category_id = ?''',
+        (read_access, write_access, member_access.user_id, member_access.category_id))
 
 def user_has_permissions_for_category(user_id: int,category_id: int):
     data = read_query('''SELECT * FROM categorymember WHERE user_id = ? and category_id = ?''',(user_id,category_id))

@@ -34,3 +34,7 @@ class Member(BaseModel):
     category_id: int
     read_access: bool
     write_access: bool
+
+class RevokeMemberAccess(BaseModel):
+    user_id: int
+    category_id: int
