@@ -10,7 +10,7 @@ def get_all():
 
 
 def get_category_by_id_with_topics(category_id: int) -> CategoryWithTopics | None:
-    category_data = _get_category_by_id(category_id)
+    category_data = category_exists(category_id)
     if not category_data:
         return None
     topic_data = read_query("SELECT id, title, content FROM topic WHERE category_id = ?", (category_id,))
@@ -63,7 +63,7 @@ def view_privileged_users(category_id: int):
 
 def _update_helper(updated_rows: int, category_id: int) -> UpdateStatus:
     if updated_rows == 0:
-        category = _get_category_by_id(category_id)
+        category = category_exists(category_id)
         if category is None:
             return UpdateStatus.NOT_FOUND
         else:
@@ -71,7 +71,7 @@ def _update_helper(updated_rows: int, category_id: int) -> UpdateStatus:
     return UpdateStatus.SUCCESS
 
 
-def _get_category_by_id(category_id: int) -> Category | None:
+def category_exists(category_id: int) -> Category | None:
     data = read_query("SELECT id, name FROM category WHERE id = ?", (category_id,))
     if not data:
         return None
