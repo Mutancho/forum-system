@@ -60,6 +60,14 @@ def is_user_authorized_to_delete(token:str,id:int):
                (user_id,))
     role = data[0][0]
     return user_id==id or role.lower()=='admin'
+
+def is_admin(token:str):
+    user_id = oauth2.get_current_user(token)
+    data = read_query('''SELECT role FROM user WHERE id = ?''',
+                      (user_id,))
+    role = data[0][0]
+    return role.lower() == 'admin'
+
 def _hash_password(password: str):
     salt = b'$2b$12$V0NmXBYEU2o0x3nbxOPouu'
     return bcrypt.hashpw(password.encode('utf-8'), salt)

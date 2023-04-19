@@ -20,6 +20,7 @@ def create_message(message: Message,Authorization:str = Header()):
 @router_message.get('/conversations')
 def get_conversations(Authorization:str = Header()):
     token = Authorization[8:-1]
+    print(user_service.is_admin(token))
     return message_service.get_all_my_conversations(token)
 
 @router_message.get('/conversation/{id}')
