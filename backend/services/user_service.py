@@ -1,6 +1,6 @@
 import datetime
 from utils import oauth2
-from schemas.user import User,EmailLogin,UsernameLogin
+from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess
 from database.database_queries import insert_query, read_query, update_query
 import bcrypt
 
@@ -16,12 +16,19 @@ def create(user: User):
     user.created_at = read_query('''SELECT created_at FROM user WHERE id = ?''',(generate_id,))[0][0]
     return user
 
+def update(id: int,user: User):
+    password = _hash_password(user.password)
+    update_query('''UPADTE user SET username = ?, email = ? , password = ? WHERE id = ?  ''',
+                 (user.username,user.email,password,id))
+    user.id = id
+    return user
+
 def delete(id:int):
     data = update_query('''DELETE FROM user WHERE id = ?''',(id,))
 
 
 def exists_by_username_email(user: User):
-    data = read_query('''SELECT username,email FROM user WHERE username =? and email = ?''',
+    data = read_query('''SELECT username,email FROM user WHERE username =? or email = ?''',
                       (user.username, user.email))
 
     return len(data) > 0
@@ -44,7 +51,29 @@ def login(credentials: EmailLogin | UsernameLogin):
     email = data[0][2]
     password=credentials.password
 
-    return oauth2.create_access_token(id)#returns a token
+    return oauth2.create_access_token(id)
+
+def give_access(member_access: Member):
+    read_access = int(member_access.read_access)
+    write_access = int(member_access.write_access)
+    if user_has_permissions_for_category(member_access.user_id,member_access.category_id):
+        update_query('''UPDATE categorymember SET read_access = ?,write_access = ?  Where user_id = ? and category_id = ?''',
+                     (read_access,write_access,member_access.user_id,member_access.category_id))
+    else:
+        insert_query('''INSERT INTO categorymember(user_id,category_id,read_access,write_access) VALUES (?,?,?,?)''',
+                     (member_access.user_id,member_access.category_id,read_access,write_access))
+
+def revoke_access(member_access: RevokeMemberAccess):
+    read_access = 0
+    write_access = 0
+    update_query(
+        '''UPDATE categorymember SET read_access = ?,write_access = ?  Where user_id = ? and category_id = ?''',
+        (read_access, write_access, member_access.user_id, member_access.category_id))
+
+def user_has_permissions_for_category(user_id: int,category_id: int):
+    data = read_query('''SELECT * FROM categorymember WHERE user_id = ? and category_id = ?''',(user_id,category_id))
+
+    return len(data)>0
 
 def verify_credentials(credentials: EmailLogin | UsernameLogin):
     if isinstance(credentials,EmailLogin):

@@ -28,3 +28,13 @@ class UsernameLogin(BaseModel):
 class EmailLogin(BaseModel):
     email: constr(regex='([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
     password: str
+
+class Member(BaseModel):
+    user_id: int
+    category_id: int
+    read_access: bool
+    write_access: bool
+
+class RevokeMemberAccess(BaseModel):
+    user_id: int
+    category_id: int
