@@ -1,6 +1,6 @@
 import datetime
 from utils import oauth2
-from schemas.user import User,EmailLogin,UsernameLogin
+from schemas.user import User, EmailLogin, UsernameLogin, Member
 from database.database_queries import insert_query, read_query, update_query
 import bcrypt
 
@@ -44,7 +44,22 @@ def login(credentials: EmailLogin | UsernameLogin):
     email = data[0][2]
     password=credentials.password
 
-    return oauth2.create_access_token(id)#returns a token
+    return oauth2.create_access_token(id)
+
+def give_access(member_access: Member):
+    read_access = int(member_access.read_access)
+    write_access = int(member_access.write_access)
+    if user_has_permissions_for_category(member_access.user_id,member_access.category_id):
+        update_query('''UPDATE categorymember SET read_access = ?,write_access = ?  Where user_id = ? and category_id = ?''',
+                     (read_access,write_access,member_access.user_id,member_access.category_id))
+    else:
+        update_query('''INSERT INTO categorymember(user_id,category_id,read_access,write_access) VALUES (?,?,?,?)''',
+                     (member_access.user_id,member_access.category_id,read_access,write_access))
+
+def user_has_permissions_for_category(user_id: int,category_id: int):
+    data = read_query('''SELECT * FROM categorymember WHERE user_id = ? and category_id = ?''',(user_id,category_id))
+
+    return len(data)>0
 
 def verify_credentials(credentials: EmailLogin | UsernameLogin):
     if isinstance(credentials,EmailLogin):

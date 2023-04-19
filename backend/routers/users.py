@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response,Header
 from fastapi.security import OAuth2PasswordBearer
-from schemas.user import User,EmailLogin,UsernameLogin
-from services import user_service
+from schemas.user import User, EmailLogin, UsernameLogin, Member
+from services import user_service, category_service
 from utils import oauth2
 
 router_user = APIRouter(prefix='/users',tags=['Users'])
@@ -19,7 +19,7 @@ def delete_user(id:int,Authorization:str = Header()):
     if not user_service.exists_by_id(id):
         return Response(status_code=404)
     if not user_service.is_user_authorized_to_delete(token,id):
-        return Response(status_code=401)
+        return Response(status_code=403)
     user_service.delete(id)
     return Response(status_code=204)
 
@@ -35,4 +35,15 @@ def login(credentials: EmailLogin | UsernameLogin):
         return Response(status_code=401,content='Invalid password.')
 
     return user_service.login(credentials)
+
+@router_user.post('/give_access')
+def give_access(member_access: Member,Authorization:str = Header()):
+    token = Authorization[8:-1]
+    if not user_service.is_admin(token):
+        return Response(status_code=403)
+    if not user_service.exists_by_id(member_access.user_id):
+        return Response(status_code=400,content=f'User with id: {member_access.user_id} does not exist!')
+
+    user_service.give_access(member_access)
+    return Response(status_code=200)
 
