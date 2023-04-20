@@ -9,7 +9,7 @@ class User(BaseModel):
     created_at: date | None
 
     @classmethod
-    def from_query_result(cls, id, username, email, password, role,created_at):
+    def from_query_result(cls, id, username, email, role,created_at, password = '*********'):
         return cls(id=id,username=username,email=email,password=password,role=role,created_at=created_at)
 
 class DisplayUser(BaseModel):

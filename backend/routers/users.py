@@ -5,6 +5,20 @@ from services import user_service, category_service
 from utils import oauth2
 
 router_user = APIRouter(prefix='/users',tags=['Users'])
+@router_user.get('/')
+def get_all_users(Authorization:str = Header()):
+    token = Authorization[8:-1]
+    if not user_service.is_admin(token):
+        return Response(status_code=403)
+    return user_service.all()
+@router_user.get('/{id}')
+def get_user_bt_id(id:int , Authorization:str = Header()):
+    token = Authorization[8:-1]
+    if not user_service.exists_by_id(id):
+        return Response(status_code=404)
+    if not user_service.is_user_authorized_to_get_delete(token,id):
+        return Response(status_code=403)
+    return user_service.get_by_id(id)
 
 @router_user.post('/', status_code=201)
 def create_user(user: User):
@@ -31,7 +45,7 @@ def delete_user(id:int,Authorization:str = Header()):
     token = Authorization[8:-1]
     if not user_service.exists_by_id(id):
         return Response(status_code=404)
-    if not user_service.is_user_authorized_to_delete(token,id):
+    if not user_service.is_user_authorized_to_get_delete(token,id):
         return Response(status_code=403)
     user_service.delete(id)
     return Response(status_code=204)
@@ -56,6 +70,8 @@ def give_access(member_access: Member,Authorization:str = Header()):
         return Response(status_code=403)
     if not user_service.exists_by_id(member_access.user_id):
         return Response(status_code=400,content=f'User with id: {member_access.user_id} does not exist!')
+    if category_service.category_exists(member_access.category_id) == None:
+        return Response(status_code=400,content=f'Category with id: {member_access.category_id} does not exist!')
 
     user_service.give_access(member_access)
     return Response(status_code=200)
