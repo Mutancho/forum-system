@@ -5,6 +5,10 @@ from database.database_queries import insert_query, read_query, update_query
 import bcrypt
 
 
+def all():
+    data = read_query('''SELECT id, username, email, role, created_at FROM user''')
+
+    return (User.from_query_result(*u) for u in data)
 
 def create(user: User):
 
@@ -26,7 +30,10 @@ def update(id: int,user: User):
 def delete(id:int):
     data = update_query('''DELETE FROM user WHERE id = ?''',(id,))
 
-
+def get_by_id(id: int):
+    data = read_query('''SELECT id, username, email, role, created_at FROM user WHERE id = ?''',
+                      (id,))
+    return User.from_query_result(*data[0])
 def exists_by_username_email(user: User):
     data = read_query('''SELECT username,email FROM user WHERE username =? or email = ?''',
                       (user.username, user.email))
@@ -83,7 +90,7 @@ def verify_credentials(credentials: EmailLogin | UsernameLogin):
         data = read_query('''SELECT username,email,password FROM user WHERE username = ?''',
                           (credentials.username,))
     return len(data)>0
-def is_user_authorized_to_delete(token:str,id:int):
+def is_user_authorized_to_get_delete(token:str,id:int):
     user_id = oauth2.get_current_user(token)
     data = read_query('''SELECT role FROM user WHERE id = ?''',
                (user_id,))
