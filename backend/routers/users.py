@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response,Header
 from fastapi.security import OAuth2PasswordBearer
-from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess
+from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
 from services import user_service, category_service
 from utils import oauth2
 
@@ -28,17 +28,17 @@ def create_user(user: User):
     return user_service.create(user)
 
 @router_user.put('/{id}')
-def update_user(id: int,user: User,Authorization:str = Header()):
+def update_user(id: int,user: UpdateUser,Authorization:str = Header()):
     token = Authorization[8:-1]
     auth_user_id = oauth2.get_current_user(token)
     if not user_service.exists_by_id(id):
         return Response(status_code=404)
     if id != auth_user_id:
         return Response(status_code=403)
-    if user_service.exists_by_username_email(user):
-        return Response(status_code= 400, content=f'A User with this username: {user.username} and email: {user.email} already exists!')
+    if user_service.check_unique_update_email_password(id,user):
+        return Response(status_code= 400, content=f'A User with this username or email already exists!')
 
-    return user_service.update_query(id,user)
+    return user_service.update(id,user)
 
 @router_user.delete('/{id}')
 def delete_user(id:int,Authorization:str = Header()):

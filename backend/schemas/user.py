@@ -12,6 +12,10 @@ class User(BaseModel):
     def from_query_result(cls, id, username, email, role,created_at, password = '*********'):
         return cls(id=id,username=username,email=email,password=password,role=role,created_at=created_at)
 
+class UpdateUser(BaseModel):
+    username: str
+    email: constr(regex='([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+    password: constr(min_length=6)
 class DisplayUser(BaseModel):
     id: int
     username: str
