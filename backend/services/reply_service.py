@@ -1,3 +1,5 @@
+import datetime
+
 from database.database_queries import read_query, insert_query, update_query
 from services.validations import UpdateStatus
 from schemas.reply import ReplyWithUserAndTopic, Vote, Reply, UpdateReply
@@ -27,8 +29,9 @@ def create(reply: Reply,topic_id,token):
 def update_reply(reply_id: int,reply: UpdateReply):
     content = reply.content
     update_query('''UPDATE reply SET content = ? WHERE id = ?''',(content,reply_id))
+    update_time = read_query('''SELECT updated_at FROM reply WHERE id = ?''',(reply_id,))
 
-    return {"id": reply_id, "content": content}
+    return {"id": reply_id, "content": content,"update on": update_time[0][0].strftime("%d-%m-%Y %H:%M:%S")}
 
 
 def reply_vote(id:int , vote: Vote,token):
