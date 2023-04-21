@@ -1,6 +1,6 @@
 from database.database_queries import read_query, insert_query, update_query
 from services.validations import UpdateStatus
-from schemas.reply import ReplyWithUserAndTopic, Vote, Reply
+from schemas.reply import ReplyWithUserAndTopic, Vote, Reply, UpdateReply
 from utils import oauth2
 
 
@@ -24,8 +24,11 @@ def create(reply: Reply,topic_id,token):
     return {"id": reply.id, "content": content}
 
 
-def update_reply():
-    pass
+def update_reply(reply_id: int,reply: UpdateReply):
+    content = reply.content
+    update_query('''UPDATE reply SET content = ? WHERE id = ?''',(content,reply_id))
+
+    return {"id": reply_id, "content": content}
 
 
 def reply_vote(id:int , vote: Vote,token):

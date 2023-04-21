@@ -3,13 +3,16 @@ from datetime import date
 
 class Reply(BaseModel):
     id: int | None
-    content: str
+    content: constr(min_length=1)
     created_at: date | None
     updated_at: date | None
 
     @classmethod
     def from_query_result(cls, id, content, created_at, updated_at):
         return cls(id=id, content=content, updated_at=updated_at, created_at=created_at)
+
+class UpdateReply(BaseModel):
+    content: constr(min_length=1)
 
 class BaseReply(BaseModel):
     id: int | None

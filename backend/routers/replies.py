@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, HTTPException,Response,Header
 
 from services import reply_service, category_service, topic_service
 from services.reply_service import get_all
-from schemas.reply import BaseReply, Vote, Reply
+from schemas.reply import BaseReply, Vote, Reply, UpdateReply
 from routers.helper_functions import query_filters
 
 router_reply = APIRouter(prefix="/categories/{category_id}/topics/{topic_id}/replies", tags=["Replies"])
@@ -29,7 +29,17 @@ def create_reply(category_id: int,topic_id: int,reply: Reply,Authorization:str =
 
     return reply_service.create(reply,topic_id,token)
 
+@router_reply.put('/{id}')
+def update_reply(category_id: int,topic_id: int,id: int,reply: UpdateReply,Authorization:str = Header()):
+    token = Authorization[8:-1]
+    if category_service.category_exists(category_id) == None:
+        return Response(status_code=404, content="Category Not Found")
+    if topic_service._get_topic_by_id(topic_id) == None:
+        return Response(status_code=404, content="Topic Not Found")
+    if not reply_service.exists_by_id(id):
+        return Response(status_code=404, content='Reply Not Found')
 
+    return reply_service.update_reply(id,reply)
 
 @router_reply.get("/")
 def get_all_replies_from_topic(topic_id: int, search: str | None = None, sort: str | None = None,
