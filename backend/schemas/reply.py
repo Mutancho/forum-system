@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from datetime import date
 
 
@@ -15,3 +15,6 @@ class ReplyTimeStamps(BaseReply):
 class ReplyWithUserAndTopic(ReplyTimeStamps):
     user_id: int
     topic_id: int
+
+class Vote(BaseModel):
+    vote: constr(regex='(?i)^(upvote|downvote)$')

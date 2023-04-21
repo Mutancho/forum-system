@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from services.topic_service import create, get_all, lock, unlock
 from schemas.topic import TopicWithUserAndCategory, BaseTopic
-from routers.helper_functions import query_filters, handle_updates, TOPIC
+from routers.helper_functions import query_filters
 
 router_topic = APIRouter(prefix="/categories/{category_id}/topics", tags=["Topics"])
 
