@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
+from schemas.reply import BaseReply
 
 
 class BaseTopic(BaseModel):
@@ -14,10 +15,15 @@ class TopicsTimeStamps(BaseModel):
 
 
 class TopicWithUserAndCategory(BaseTopic):
-    user_id: int
+    user_id: int | None
     category_id: int
 
 
 class TopicsOut(TopicsTimeStamps, TopicWithUserAndCategory):
     locked: bool
     best_reply: str | None
+
+
+class TopicWithReplies(BaseModel):
+    topic: BaseTopic
+    replies: list[BaseReply]
