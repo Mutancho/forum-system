@@ -1,10 +1,9 @@
 from fastapi import FastAPI
-
-from routers.replies import router_reply
 from routers.users import router_user
 from routers.categories import router_category
 from routers.messages import router_message
 from routers.topics import router_topic
+from routers.replies import router_reply
 
 app = FastAPI()
 app.include_router(router_user)

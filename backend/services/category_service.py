@@ -19,9 +19,8 @@ def get_category_by_id_with_topics(token: str, category_id: int) -> CategoryWith
         return UpdateStatus.NOT_FOUND
 
     if not is_admin(token):
-        if is_category_private(category_id)[0][0]:
-            if not category_read_restriction_applies(user_id)[0][0]:
-                return UpdateStatus.NO_READ_ACCESS
+        if is_category_private(category_id)[0][0] and not category_read_restriction_applies(user_id)[0][0]:
+            return UpdateStatus.NO_READ_ACCESS
 
     topic_data = read_query("SELECT id, title, content FROM topic WHERE category_id = ?", (category_id,))
     topics = [BaseTopic(id=id, title=title, content=content) for id, title, content in topic_data]
@@ -80,32 +79,21 @@ def view_privileged_users(token: str, category_id: int):
                 user_id, read_access, write_access in privileged_users]
 
 
-def update_user_access(token: str, category_id: int, user_id: int, access_type: str, access_level: int):
-    if is_admin(token):
-        column_name = access_type + '_access'
-        update_rows = update_query(f"UPDATE categorymember SET {column_name} = ? WHERE user_id = ? AND category_id = ?",
-                                   (access_level, user_id, category_id))
-        if update_rows:
-            return UpdateStatus.SUCCESS
-
-
-#     todo add more details if category doesnt exist or if user etc
-
 def add_user_as_private_member(token: str, category_id: int, user_id: int):
     if not (category_exists(category_id) and exists_by_id(user_id)):
         return UpdateStatus.NOT_FOUND
     if not is_admin(token):
         return UpdateStatus.ADMIN_REQUIRED
 
-    # Check if the entry already exists
     existing_entry = read_query("SELECT * FROM categorymember WHERE user_id = ? AND category_id = ?",
                                 (user_id, category_id))
     if existing_entry:
         return UpdateStatus.DUPLICATE_ENTRY
 
-    added_row = insert_query("INSERT INTO categorymember (user_id, category_id) VALUES (?,?)", (user_id, category_id))
-    if added_row > 0:
-        return UpdateStatus.SUCCESS
+    insert_query("INSERT INTO categorymember (user_id, category_id, read_access) VALUES (?,?,?)",
+                             (user_id, category_id, 1))
+
+    return UpdateStatus.SUCCESS
 
 
 def remove_user_as_private_member(token: str, category_id: int, user_id: int):
@@ -151,3 +139,11 @@ def is_category_private(category_id: int):
 
 def category_read_restriction_applies(user_id: int):
     return read_query("SELECT read_access FROM categorymember WHERE user_id = ?", (user_id,))
+
+
+def category_write_restriction_applies(user_id: int):
+    return read_query("SELECT write_access FROM categorymember WHERE user_id = ?", (user_id,))
+
+
+def is_category_locked(category_id: int):
+    return read_query("SELECT locked FROM category WHERE id = ?", (category_id,))

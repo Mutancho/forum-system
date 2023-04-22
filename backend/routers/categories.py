@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Header, Query
 from services.category_service import (get_all, create, update, delete, get_category_by_id_with_topics,
                                        lock, unlock, make_private, make_non_private, view_privileged_users,
-                                       update_user_access, add_user_as_private_member, remove_user_as_private_member)
+                                       add_user_as_private_member, remove_user_as_private_member)
 from schemas.category import Category
 from routers.helper_functions import query_filters, http_validations, Constants
 
@@ -96,11 +96,3 @@ def make_category_non_private(category_id: int, auth: str = Header(alias="Author
     update_status = make_non_private(token, category_id)
     return http_validations(update_status, Constants.CATEGORY)
 
-
-@router_category.put("/{category_id}/access/{user_id}")
-def update_user_access_to_category(category_id: int, user_id: int,
-                                   access_type: str = Query(...), access_level: int = Query(...),
-                                   auth: str = Header(alias="Authorization")):
-    token = auth[8:-1]
-    update_status = update_user_access(token, category_id, user_id, access_type, access_level)
-    return http_validations(update_status, Constants.CATEGORY)
