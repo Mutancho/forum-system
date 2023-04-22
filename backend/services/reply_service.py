@@ -14,7 +14,7 @@ def get_all(topic_id: int):
 def get_by_id(reply_id: int):
     data = read_query('''SELECT id, content, created_at, updated_at FROM reply WHERE id = ?''',(reply_id,))
 
-    return Reply.from_query_result(*data[0])
+    return {**dict(Reply.from_query_result(*data[0])),**get_votes_for_reply(reply_id)}
 
 
 def create(reply: Reply,topic_id,token):
@@ -23,7 +23,7 @@ def create(reply: Reply,topic_id,token):
     generate_id = insert_query('''INSERT INTO reply(content,user_id,topic_id) VALUES (?,?,?)''',(content,user_id,topic_id))
     reply.id = generate_id
 
-    return {"id": reply.id, "content": content}
+    return {**{"id": reply.id, "content": content},**get_votes_for_reply(generate_id)}
 
 
 def update_reply(reply_id: int,reply: UpdateReply):
@@ -31,7 +31,7 @@ def update_reply(reply_id: int,reply: UpdateReply):
     update_query('''UPDATE reply SET content = ? WHERE id = ?''',(content,reply_id))
     update_time = read_query('''SELECT updated_at FROM reply WHERE id = ?''',(reply_id,))
 
-    return {"id": reply_id, "content": content,"update on": update_time[0][0].strftime("%d-%m-%Y %H:%M:%S")}
+    return {**{"id": reply_id, "content": content, "update on": update_time[0][0].strftime("%d-%m-%Y %H:%M:%S")},**get_votes_for_reply(reply_id)}
 
 
 def reply_vote(id:int , vote: Vote,token):
@@ -61,6 +61,16 @@ def already_voted(reply_id: int,token):
 
     return len(data)>0
 
+def get_votes_for_reply(reply_id: int):
+    data = read_query('''SELECT vote_type FROM replyvote WHERE reply_id = ? ''', (reply_id,))
+    upvote = 0
+    downvote = 0
+    for vote in data:
+        if vote[0] == 'upvote':
+            upvote += 1
+        elif vote[0] == 'downvote':
+            downvote += 1
+    return {'upvote': upvote,'downvote': downvote}
 def is_reply_owner(reply_id,token):
     auth_user_id = oauth2.get_current_user(token)
     data = read_query('''SELECT user_id FROM reply WHERE id = ? ''',(reply_id,))
