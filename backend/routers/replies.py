@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, HTTPException,Response,Header
 
-from services import reply_service, category_service, topic_service
+from services import reply_service, category_service, topic_service, user_service
 from services.reply_service import get_all
 from schemas.reply import BaseReply, Vote, Reply, UpdateReply
 from routers.helper_functions import query_filters
@@ -41,6 +41,21 @@ def update_reply(category_id: int,topic_id: int,id: int,reply: UpdateReply,Autho
 
     return reply_service.update_reply(id,reply)
 
+@router_reply.delete('/{id}')
+def delete_reply(category_id: int,topic_id: int,id: int,Authorization:str = Header()):
+    token = Authorization[8:-1]
+    if category_service.category_exists(category_id) == None:
+        return Response(status_code=404, content="Category Not Found")
+    if topic_service._get_topic_by_id(topic_id) == None:
+        return Response(status_code=404, content="Topic Not Found")
+    if not reply_service.exists_by_id(id):
+        return Response(status_code=404, content='Reply Not Found')
+    if reply_service.is_reply_owner(id,token) or topic_service.is_topic_owner(topic_id, token) or user_service.is_admin(token):
+        reply_service.delete(id)
+        return Response(status_code=204)
+    else:
+        return Response(status_code=403)
+
 @router_reply.get("/")
 def get_all_replies_from_topic(topic_id: int, search: str | None = None, sort: str | None = None,
                                skip: int | None = None, limit: int | None = None):
@@ -76,3 +91,4 @@ def reply_vote(category_id: int,topic_id: int,id: int,vote: Vote,Authorization:s
         return Response(status_code=400, content="You haven't yet voted for this reply")
 
     return reply_service.update_reply_vote(id,vote,token)
+

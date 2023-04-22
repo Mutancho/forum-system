@@ -52,6 +52,8 @@ def update_reply_vote(id:int , vote: Vote,token):
     vote.vote = vote_type.capitalize()
     return vote
 
+def delete(id: int):
+    update_query('''DELETE FROM reply WHERE id =? ''',(id,))
 
 def already_voted(reply_id: int,token):
     user_id = oauth2.get_current_user(token)
@@ -59,8 +61,11 @@ def already_voted(reply_id: int,token):
 
     return len(data)>0
 
-def set_best_reply():
-    pass
+def is_reply_owner(reply_id,token):
+    auth_user_id = oauth2.get_current_user(token)
+    data = read_query('''SELECT user_id FROM reply WHERE id = ? ''',(reply_id,))
+    user_id = data[0][0]
+    return user_id == auth_user_id
 
 def exists_by_id(id: int):
     data = read_query('''SELECT * FROM reply WHERE id = ?''',(id,))

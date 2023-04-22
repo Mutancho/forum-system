@@ -1,7 +1,7 @@
 from database.database_queries import read_query, insert_query, update_query
 from schemas.topic import TopicWithUserAndCategory, TopicsOut, BaseTopic
 from services.validations import UpdateStatus
-
+from utils import oauth2
 
 def get_all(category_id: int):
     query = read_query("SELECT * FROM topic where category_id=?", (category_id,))
@@ -51,3 +51,9 @@ def _get_topic_by_id(topic_id: int) -> BaseTopic | None:
     if not data:
         return None
     return BaseTopic(id=data[0][0], title=data[0][1], content=data[0][2])
+
+def is_topic_owner(topic_id,token):
+    auth_user_id = oauth2.get_current_user(token)
+    data = read_query('''SELECT user_id FROM topic WHERE id = ? ''',(topic_id,))
+    user_id = data[0][0]
+    return user_id == auth_user_id
