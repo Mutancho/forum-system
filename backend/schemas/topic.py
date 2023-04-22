@@ -16,12 +16,15 @@ class TopicsTimeStamps(BaseModel):
 
 class TopicWithUserAndCategory(BaseTopic):
     user_id: int | None
-    category_id: int
+    category_id: int | None
 
 
-class TopicsOut(TopicsTimeStamps, TopicWithUserAndCategory):
-    locked: bool
-    best_reply: str | None
+# class TopicsOut(TopicsTimeStamps, TopicWithUserAndCategory):
+#     locked: bool
+#     best_reply_id: str | None
+
+class TopicBestReply(BaseModel):
+    best_reply_id: int
 
 
 class TopicWithReplies(BaseModel):
