@@ -20,7 +20,7 @@ USE `forumproject` ;
 -- -----------------------------------------------------
 -- Table `forumproject`.`category`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `forumproject`.`category` (
+CREATE TABLE IF NOT EXISTS `forumproject`.`categories` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
   `is_private` TINYINT(1) NOT NULL DEFAULT '0',
@@ -33,7 +33,7 @@ DEFAULT CHARACTER SET = latin1;
 -- -----------------------------------------------------
 -- Table `forumproject`.`user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `forumproject`.`user` (
+CREATE TABLE IF NOT EXISTS `forumproject`.`users` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
@@ -51,7 +51,7 @@ DEFAULT CHARACTER SET = latin1;
 -- -----------------------------------------------------
 -- Table `forumproject`.`categorymember`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `forumproject`.`categorymember` (
+CREATE TABLE IF NOT EXISTS `forumproject`.`categorymembers` (
   `user_id` INT(11) NOT NULL,
   `category_id` INT(11) NOT NULL,
   `read_access` TINYINT(1) NOT NULL DEFAULT '0',
@@ -71,7 +71,7 @@ DEFAULT CHARACTER SET = latin1;
 -- -----------------------------------------------------
 -- Table `forumproject`.`message`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `forumproject`.`message` (
+CREATE TABLE IF NOT EXISTS `forumproject`.`messages` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `content` TEXT NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -94,7 +94,7 @@ DEFAULT CHARACTER SET = latin1;
 -- -----------------------------------------------------
 -- Table `forumproject`.`topic`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `forumproject`.`topic` (
+CREATE TABLE IF NOT EXISTS `forumproject`.`topics` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(255) NOT NULL,
   `content` TEXT NOT NULL,
@@ -127,7 +127,7 @@ DEFAULT CHARACTER SET = latin1;
 -- -----------------------------------------------------
 -- Table `forumproject`.`reply`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `forumproject`.`reply` (
+CREATE TABLE IF NOT EXISTS `forumproject`.`replies` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `content` TEXT NOT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -152,7 +152,7 @@ DEFAULT CHARACTER SET = latin1;
 -- -----------------------------------------------------
 -- Table `forumproject`.`replyvote`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `forumproject`.`replyvote` (
+CREATE TABLE IF NOT EXISTS `forumproject`.`replyvotes` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `reply_id` INT(11) NOT NULL,
   `vote_type` ENUM('upvote', 'downvote') NOT NULL,
