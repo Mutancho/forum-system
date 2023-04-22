@@ -1,6 +1,6 @@
 import datetime
 from utils import oauth2
-from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess
+from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
 from database.database_queries import insert_query, read_query, update_query
 import bcrypt
 
@@ -20,12 +20,19 @@ def create(user: User):
     user.created_at = read_query('''SELECT created_at FROM user WHERE id = ?''',(generate_id,))[0][0]
     return user
 
-def update(id: int,user: User):
+def update(id: int,user: UpdateUser):
     password = _hash_password(user.password)
-    update_query('''UPADTE user SET username = ?, email = ? , password = ? WHERE id = ?  ''',
+    update_query('''UPDATE user SET username = ?, email = ? , password = ? WHERE id = ?  ''',
                  (user.username,user.email,password,id))
-    user.id = id
+
     return user
+
+def check_unique_update_email_password(id: int,user: UpdateUser):
+    data = read_query('''SELECT username,email FROM user WHERE (username = ? OR email = ?) AND id <> ?''',
+                      (user.username, user.email,id))
+
+    return len(data) > 0
+
 
 def delete(id:int):
     data = update_query('''DELETE FROM user WHERE id = ?''',(id,))

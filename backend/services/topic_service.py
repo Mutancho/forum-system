@@ -113,6 +113,12 @@ def get_topic_by_id(topic_id: int) -> BaseTopic | None:
         return None
     return BaseTopic(id=data[0][0], title=data[0][1], content=data[0][2])
 
+def is_topic_owner(topic_id,token):
+    auth_user_id = get_current_user(token)
+    data = read_query('''SELECT user_id FROM topic WHERE id = ? ''',(topic_id,))
+    user_id = data[0][0]
+    return user_id == auth_user_id
+
 
 def is_topic_locked(topic_id: int):
     return read_query("SELECT locked FROM topic WHERE id = ?", (topic_id,))
