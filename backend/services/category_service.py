@@ -80,21 +80,20 @@ def view_privileged_users(token: str, category_id: int):
 
 
 def add_user_as_private_member(token: str, category_id: int, user_id: int):
-    # todo give read access when added to table
     if not (category_exists(category_id) and exists_by_id(user_id)):
         return UpdateStatus.NOT_FOUND
     if not is_admin(token):
         return UpdateStatus.ADMIN_REQUIRED
 
-    # Check if the entry already exists
     existing_entry = read_query("SELECT * FROM categorymember WHERE user_id = ? AND category_id = ?",
                                 (user_id, category_id))
     if existing_entry:
         return UpdateStatus.DUPLICATE_ENTRY
 
-    added_row = insert_query("INSERT INTO categorymember (user_id, category_id) VALUES (?,?)", (user_id, category_id))
-    if added_row > 0:
-        return UpdateStatus.SUCCESS
+    insert_query("INSERT INTO categorymember (user_id, category_id, read_access) VALUES (?,?,?)",
+                             (user_id, category_id, 1))
+
+    return UpdateStatus.SUCCESS
 
 
 def remove_user_as_private_member(token: str, category_id: int, user_id: int):
