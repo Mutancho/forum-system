@@ -12,7 +12,7 @@ def get_reply_by_id(category_id: int,topic_id: int,id: int,Authorization:str = H
     token = Authorization[8:-1]
     if category_service.category_exists(category_id) == None:
         return Response(status_code=404, content="Category Not Found")
-    if topic_service._get_topic_by_id(topic_id) == None:
+    if topic_service.get_topic_by_id(topic_id) == None:
         return Response(status_code=404, content="Topic Not Found")
     if not reply_service.exists_by_id(id):
         return Response(status_code=404, content='Reply Not Found')
@@ -24,7 +24,7 @@ def create_reply(category_id: int,topic_id: int,reply: Reply,Authorization:str =
     token = Authorization[8:-1]
     if category_service.category_exists(category_id) == None:
         return Response(status_code=404, content="Category Not Found")
-    if topic_service._get_topic_by_id(topic_id) == None:
+    if topic_service.get_topic_by_id(topic_id) == None:
         return Response(status_code=404, content="Topic Not Found")
 
     return reply_service.create(reply,topic_id,token)
@@ -34,7 +34,7 @@ def update_reply(category_id: int,topic_id: int,id: int,reply: UpdateReply,Autho
     token = Authorization[8:-1]
     if category_service.category_exists(category_id) == None:
         return Response(status_code=404, content="Category Not Found")
-    if topic_service._get_topic_by_id(topic_id) == None:
+    if topic_service.get_topic_by_id(topic_id) == None:
         return Response(status_code=404, content="Topic Not Found")
     if not reply_service.exists_by_id(id):
         return Response(status_code=404, content='Reply Not Found')
@@ -46,7 +46,7 @@ def delete_reply(category_id: int,topic_id: int,id: int,Authorization:str = Head
     token = Authorization[8:-1]
     if category_service.category_exists(category_id) == None:
         return Response(status_code=404, content="Category Not Found")
-    if topic_service._get_topic_by_id(topic_id) == None:
+    if topic_service.get_topic_by_id(topic_id) == None:
         return Response(status_code=404, content="Topic Not Found")
     if not reply_service.exists_by_id(id):
         return Response(status_code=404, content='Reply Not Found')
@@ -68,7 +68,7 @@ def reply_vote(category_id: int,topic_id: int,id: int,vote: Vote,Authorization:s
     token = Authorization[8:-1]
     if category_service.category_exists(category_id) == None:
         return Response(status_code=404, content="Category Not Found")
-    if topic_service._get_topic_by_id(topic_id) == None:
+    if topic_service.get_topic_by_id(topic_id) == None:
         return Response(status_code=404, content="Topic Not Found")
     if not reply_service.exists_by_id(id):
         return Response(status_code=404,content='Reply Not Found')
@@ -83,7 +83,7 @@ def reply_vote(category_id: int,topic_id: int,id: int,vote: Vote,Authorization:s
     token = Authorization[8:-1]
     if category_service.category_exists(category_id) == None:
         return Response(status_code=404, content="Category Not Found")
-    if topic_service._get_topic_by_id(topic_id) == None:
+    if topic_service.get_topic_by_id(topic_id) == None:
         return Response(status_code=404, content="Topic Not Found")
     if not reply_service.exists_by_id(id):
         return Response(status_code=404,content='Reply Not Found')
