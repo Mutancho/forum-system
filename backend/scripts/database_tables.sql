@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS `forumproject`.`categories` (
   `name` VARCHAR(255) NOT NULL,
   `is_private` TINYINT(1) NOT NULL DEFAULT '0',
   `locked` TINYINT(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 
