@@ -9,16 +9,20 @@ router_category = APIRouter(prefix="/categories", tags=["Categories"])
 
 
 @router_category.get("/")
-def get_categories(search: str | None = None, sort: str | None = None,
-                   skip: int | None = None, limit: int | None = None):
+def get_categories():
     data = get_all()
-    return query_filters(data, key="name", search=search, sort=sort, skip=skip, limit=limit)
+    return data
 
 
 @router_category.get("/{category_id}")
-def get_category_by_id(category_id: int, auth: str = Header(alias="Authorization")):
+def get_category_by_id(category_id: int, search: str | None = None, sort: str | None = None,
+                       skip: int | None = None, limit: int | None = None, auth: str = Header(alias="Authorization")):
     token = auth[8:-1]
     category_with_topics = get_category_by_id_with_topics(token, category_id)
+
+    category_with_topics.topics = query_filters(category_with_topics.topics, key="title", search=search, sort=sort,
+                                                skip=skip,
+                                                limit=limit)
     return http_validations(category_with_topics, Constants.CATEGORY)
 
 
@@ -95,4 +99,3 @@ def make_category_non_private(category_id: int, auth: str = Header(alias="Author
     token = auth[8:-1]
     update_status = make_non_private(token, category_id)
     return http_validations(update_status, Constants.CATEGORY)
-
