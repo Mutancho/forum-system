@@ -1,9 +1,7 @@
-import datetime
-from datetime import date
+
 import unittest
 from unittest.mock import Mock, create_autospec, patch
 from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
-import bcrypt
 from services import user_service
 
 class UserService_Should(unittest.TestCase):
@@ -142,7 +140,7 @@ class UserService_Should(unittest.TestCase):
         user_service.insert_query.assert_called_once()
 
     def test_revokeAccess(self):
-        member_access = Member(user_id=1,category_id=1,read_access=True,write_access=True)
+        member_access = Member(user_id=1,category_id=1,read_access=False,write_access=False)
         user_service.update_query = Mock()
 
         user_service.revoke_access(member_access)
