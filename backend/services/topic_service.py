@@ -1,5 +1,6 @@
 from database.database_queries import read_query, insert_query, update_query
-from schemas.topic import TopicWithUserAndCategory, BaseTopic, TopicWithReplies, TopicBestReply
+from schemas.topic import TopicWithUserAndCategoryWithContent, TopicWithContent, TopicWithReplies, TopicBestReply, \
+    TopicsTimeStamps
 from schemas.reply import BaseReply
 from services.user_service import is_admin
 from services.validations import UpdateStatus
@@ -7,6 +8,12 @@ from services.reply_service import exists_by_id
 from utils.oauth2 import get_current_user
 from services.category_service import is_category_private, category_read_restriction_applies, category_exists, \
     category_write_restriction_applies, is_category_locked
+
+
+def get_all():
+    query = read_query("SELECT id, title, created_at, updated_at from topics")
+    return [TopicsTimeStamps(id=topic_id, title=title, created_at=created_at, updated_at=updated_at) for
+            topic_id, title, created_at, updated_at in query]
 
 
 def get_topic_by_id_with_replies(token: str, category_id: int, topic_id: int) -> TopicWithReplies | UpdateStatus:
@@ -26,7 +33,7 @@ def get_topic_by_id_with_replies(token: str, category_id: int, topic_id: int) ->
     return TopicWithReplies(topic=topic_data, replies=replies)
 
 
-def create(token: str, category_id: int, topic: TopicWithUserAndCategory):
+def create(token: str, category_id: int, topic: TopicWithUserAndCategoryWithContent):
     user_id = get_current_user(token)
     if not is_admin(token):
         if is_category_private(category_id)[0][0] and not category_write_restriction_applies(user_id)[0][0]:
@@ -57,7 +64,7 @@ def delete(token: str, topic_id: int) -> UpdateStatus:
     return UpdateStatus.BAD_REQUEST
 
 
-def update(token: str, topic_id: int, topic: BaseTopic) -> UpdateStatus:
+def update(token: str, topic_id: int, topic: TopicWithContent) -> UpdateStatus:
     user_id = get_current_user(token)
     updated_rows = update_query("UPDATE topics SET title = ?, content = ? WHERE id = ? AND user_id = ?",
                                 (topic.title, topic.content, topic_id, user_id))
@@ -90,11 +97,11 @@ def unlock(token: str, topic_id: int) -> UpdateStatus | None:
         return _update_helper(updated_rows, topic_id)
 
 
-def topic_exists(topic_id: int) -> BaseTopic | None:
+def topic_exists(topic_id: int) -> TopicWithContent | None:
     data = read_query("SELECT id, title, content FROM topics where id = ?", (topic_id,))
     if not data:
         return None
-    return BaseTopic(id=data[0][0], title=data[0][1], content=data[0][2])
+    return TopicWithContent(id=data[0][0], title=data[0][1], content=data[0][2])
 
 
 def _update_helper(updated_rows: int, topic_id: int) -> UpdateStatus:
@@ -107,15 +114,16 @@ def _update_helper(updated_rows: int, topic_id: int) -> UpdateStatus:
     return UpdateStatus.SUCCESS
 
 
-def get_topic_by_id(topic_id: int) -> BaseTopic | None:
+def get_topic_by_id(topic_id: int) -> TopicWithContent | None:
     data = read_query("SELECT id, title, content FROM topics WHERE id = ?", (topic_id,))
     if not data:
         return None
-    return BaseTopic(id=data[0][0], title=data[0][1], content=data[0][2])
+    return TopicWithContent(id=data[0][0], title=data[0][1], content=data[0][2])
 
-def is_topic_owner(topic_id,token):
+
+def is_topic_owner(topic_id, token):
     auth_user_id = get_current_user(token)
-    data = read_query('''SELECT user_id FROM topics WHERE id = ? ''',(topic_id,))
+    data = read_query('''SELECT user_id FROM topics WHERE id = ? ''', (topic_id,))
     user_id = data[0][0]
     return user_id == auth_user_id
 
