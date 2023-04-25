@@ -13,7 +13,8 @@ def get_all(topic_id: int):
 
 def get_by_id(reply_id: int):
     data = read_query('''SELECT id, content, created_at, updated_at FROM replies WHERE id = ?''',(reply_id,))
-
+    if data == []:
+        return {}
     return {**dict(Reply.from_query_result(*data[0])),**get_votes_for_reply(reply_id)}
 
 
@@ -47,7 +48,7 @@ def update_reply_vote(id:int , vote: Vote,token):
     user_id = oauth2.get_current_user(token)
     reply_id = id
     vote_type = vote.vote.lower()
-    insert_query('''UPDATE replyvotes SET vote_type = ? WHERE reply_id = ? and user_id = ? ''',
+    update_query('''UPDATE replyvotes SET vote_type = ? WHERE reply_id = ? and user_id = ? ''',
                  (vote_type,reply_id,user_id))
     vote.vote = vote_type.capitalize()
     return vote
