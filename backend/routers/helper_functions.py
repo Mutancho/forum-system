@@ -16,7 +16,7 @@ class Constants(Enum):
 def query_filters(data, key: str, search: str | None = None, sort: str | None = None,
                   skip: int | None = None, limit: int | None = None):
     if not data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise UpdateStatus.NOT_FOUND
 
     if search:
         data = [item for item in data if search.lower() in getattr(item, key).lower()]
