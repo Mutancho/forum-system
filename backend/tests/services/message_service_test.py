@@ -18,7 +18,7 @@ class UserService_Should(unittest.TestCase):
 
             result = message_service.create(test_message)
             self.assertEqual(1,result.id)
-            self.assertEqual('2023-04-14',result.created_at)
+            self.assertEqual(('2023-04-14',),result.created_at)
 
     @patch('services.message_service.read_query', autospec=True)
     def test_getAllMyConversations_returnsListOfDisplayUser(self, mock_read_query):
