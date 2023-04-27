@@ -7,6 +7,11 @@ class Category(BaseModel):
     name: str
 
 
+class CategoryOut(Category):
+    private: bool
+    locked: bool
+
+
 class CategoryWithTopics(BaseModel):
     category: Category
     topics: list[BaseTopic]
@@ -16,4 +21,3 @@ class PrivilegedCategoryUsers(BaseModel):
     user_id: int
     read_access: bool
     write_access: bool
-

@@ -6,15 +6,18 @@ from schemas.reply import BaseReply
 class BaseTopic(BaseModel):
     id: int | None
     title: str
+
+
+class TopicWithContent(BaseTopic):
     content: str
 
 
-class TopicsTimeStamps(BaseModel):
+class TopicsTimeStamps(BaseTopic):
     created_at: date
     updated_at: date
 
 
-class TopicWithUserAndCategory(BaseTopic):
+class TopicWithUserAndCategoryWithContent(TopicWithContent):
     user_id: int | None
     category_id: int | None
 
@@ -28,5 +31,5 @@ class TopicBestReply(BaseModel):
 
 
 class TopicWithReplies(BaseModel):
-    topic: BaseTopic
+    topic: TopicWithContent
     replies: list[BaseReply]

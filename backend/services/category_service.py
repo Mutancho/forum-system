@@ -1,17 +1,19 @@
 from database.database_queries import read_query, insert_query, update_query
-from schemas.category import Category, CategoryWithTopics, PrivilegedCategoryUsers
-from schemas.topic import BaseTopic
+from schemas.category import Category, CategoryWithTopics, PrivilegedCategoryUsers, CategoryOut
+from schemas.topic import TopicWithContent, BaseTopic
 from services.validations import UpdateStatus
 from utils.oauth2 import get_current_user
 from services.user_service import is_admin, exists_by_id
 
 
 def get_all():
-    query = read_query("SELECT id, name FROM categories")
-    return [Category(id=id, name=name) for id, name in query]
+    query = read_query("SELECT * FROM categories")
+    return [CategoryOut(id=category_id, name=name, private=private, locked=locked) for
+            category_id, name, private, locked in
+            query]
 
 
-def get_category_by_id_with_topics(token: str, category_id: int) -> CategoryWithTopics | UpdateStatus:
+def get_category_by_id_with_topics(token: str, category_id: int):
     user_id = get_current_user(token)
     category_data = category_exists(category_id)
 
@@ -22,8 +24,8 @@ def get_category_by_id_with_topics(token: str, category_id: int) -> CategoryWith
         if is_category_private(category_id)[0][0] and not category_read_restriction_applies(user_id)[0][0]:
             return UpdateStatus.NO_READ_ACCESS
 
-    topic_data = read_query("SELECT id, title, content FROM topics WHERE category_id = ?", (category_id,))
-    topics = [BaseTopic(id=id, title=title, content=content) for id, title, content in topic_data]
+    topic_data = read_query("SELECT id, title FROM topics WHERE category_id = ?", (category_id,))
+    topics = [BaseTopic(id=id, title=title) for id, title in topic_data]
     return CategoryWithTopics(category=category_data, topics=topics)
 
 
@@ -91,7 +93,7 @@ def add_user_as_private_member(token: str, category_id: int, user_id: int):
         return UpdateStatus.DUPLICATE_ENTRY
 
     insert_query("INSERT INTO categorymembers (user_id, category_id, read_access) VALUES (?,?,?)",
-                             (user_id, category_id, 1))
+                 (user_id, category_id, 1))
 
     return UpdateStatus.SUCCESS
 
@@ -119,10 +121,10 @@ def _update_helper(updated_rows: int, category_id: int) -> UpdateStatus:
 
 
 def category_exists(category_id: int) -> Category | None:
-    data = read_query("SELECT id, name FROM categories WHERE id = ?", (category_id,))
+    data = read_query("SELECT * FROM categories WHERE id = ?", (category_id,))
     if not data:
         return None
-    return Category(id=data[0][0], name=data[0][1])
+    return CategoryOut(id=data[0][0], name=data[0][1], private=data[0][2], locked=data[0][3])
 
 
 def _check_duplicate_name(category_id: int, new_name: str) -> bool:
