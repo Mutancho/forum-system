@@ -41,6 +41,7 @@ class UserService_Should(unittest.TestCase):
         result = user_service.update(1, user)
         user_service.update_query.assert_called_once()
         self.assertEqual(user, result)
+        user_service.update_query.reset_mock()
 
     @patch('services.user_service.read_query', autospec=True)
     def test_checkUniqueUpdateEmailPassword_returnsFalse_when_dataIsNotPresent(self,mock_read_query):
@@ -62,6 +63,7 @@ class UserService_Should(unittest.TestCase):
         user_service.update_query = Mock()
         user_service.delete(1)
         user_service.update_query.assert_called_once()
+        user_service.update_query.reset_mock()
 
     @patch('services.user_service.read_query', autospec=True)
     def test_getById_returnsUser_when_dataIsPresent(self, mock_read_query):
@@ -98,8 +100,7 @@ class UserService_Should(unittest.TestCase):
 
     @patch('services.user_service.read_query', autospec=True)
     def test_existsById_returnsFalse_when_dataIsNotPresent(self, mock_read_query):
-        user = User(id=1, username='Test_username', email='Test_email@test.ts', password='*********', role='Test_role',
-                    created_at='2023-04-14')
+
         mock_read_query.return_value = []
 
         result = user_service.exists_by_id(1)
@@ -124,20 +125,22 @@ class UserService_Should(unittest.TestCase):
 
 
     def test_giveAccess_when_userHasPermissionsForCategory(self):
-        member_access = Member(user_id=1,category_id=1,read_access=True,write_access=True)
-        user_service.user_has_permissions_for_category = lambda a,s : True
-        user_service.update_query = Mock()
+        with patch('services.user_service.user_has_permissions_for_category') as mock_user_has_permissions_for_category:
+            member_access = Member(user_id=1,category_id=1,read_access=True,write_access=True)
+            mock_user_has_permissions_for_category =  True
+            user_service.update_query = Mock()
 
-        user_service.give_access(member_access)
-        user_service.update_query.assert_called_once()
+            user_service.give_access(member_access)
+            user_service.update_query.assert_called_once()
 
     def test_giveAccess_when_userHasNoPermissionsForCategory(self):
-        member_access = Member(user_id=1,category_id=1,read_access=True,write_access=True)
-        user_service.user_has_permissions_for_category = lambda a,s : False
-        user_service.insert_query = Mock()
+        with patch('services.user_service.user_has_permissions_for_category') as mock_user_has_permissions_for_category:
+            member_access = Member(user_id=1,category_id=1,read_access=True,write_access=True)
+            mock_user_has_permissions_for_category.return_value =  False
+            user_service.insert_query = Mock()
 
-        user_service.give_access(member_access)
-        user_service.insert_query.assert_called_once()
+            user_service.give_access(member_access)
+            user_service.insert_query.assert_called_once()
 
     def test_revokeAccess(self):
         member_access = Member(user_id=1,category_id=1,read_access=False,write_access=False)
@@ -145,6 +148,7 @@ class UserService_Should(unittest.TestCase):
 
         user_service.revoke_access(member_access)
         user_service.update_query.assert_called_once()
+        user_service.update_query.reset_mock()
 
     @patch('services.user_service.read_query', autospec=True)
     def test_userHasPermissionsForCategory_returnsTrue_when_dataIsPresent(self, mock_read_query):
