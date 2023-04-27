@@ -23,7 +23,13 @@ class UserService_Should(unittest.TestCase):
     @patch('services.message_service.read_query', autospec=True)
     def test_getAllMyConversations_returnsListOfDisplayUser(self, mock_read_query):
         message_service.oauth2.get_current_user = lambda token: 1
-        #TODO
+        mock_read_query.side_effect = [[(1,),(1,)],[(2,),(2,)],[(1, 'username1', 'email@us1.com','password1', 'user', datetime.datetime.strptime('04/14/2023, 13:58:43',"%m/%d/%Y, %H:%M:%S")),
+                                                                (2, 'username2', 'email@us2.com','password2','user', datetime.datetime.strptime('04/14/2023, 14:30:43',"%m/%d/%Y, %H:%M:%S"))]]
+
+        result = message_service.get_all_my_conversations('token')
+        expected = [DisplayUser(id=1, username='username1', email='email@us1.com'),
+                    DisplayUser(id=2, username='username2', email='email@us2.com')]
+        self.assertEqual(expected,list(result))
 
     @patch('services.message_service.read_query', autospec=True)
     def test_getAllMyConversationsWith_returnsDictOfMessages(self, mock_read_query):
