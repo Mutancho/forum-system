@@ -1,28 +1,26 @@
 from database.connection import get_connection
 
 
-
-def read_query(sql: str, sql_params=()):
-    with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute(sql, sql_params)
-
-        return list(cursor)
-
-
-def insert_query(sql: str, sql_params=()) -> int:
-    with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute(sql, sql_params)
-        conn.commit()
-
-        return cursor.lastrowid
+async def read_query(sql: str, sql_params=()) -> list:
+    pool = await get_connection()
+    async with pool.acquire() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(sql, sql_params)
+            result = await cur.fetchall()
+    return result
 
 
-def update_query(sql: str, sql_params=()) -> bool:
-    with get_connection() as conn:
-        cursor = conn.cursor()
-        cursor.execute(sql, sql_params)
-        conn.commit()
+async def insert_query(sql: str, sql_params=()) -> int:
+    async with get_connection() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(sql, sql_params)
+            await conn.commit()
+            return cursor.lastrowid
 
-        return cursor.rowcount
+
+async def update_query(sql: str, sql_params=()) -> bool:
+    async with get_connection() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(sql, sql_params)
+            await conn.commit()
+            return cursor.rowcount
