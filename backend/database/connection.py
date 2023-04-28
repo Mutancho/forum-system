@@ -1,22 +1,35 @@
-from mariadb import connect, Error
-from mariadb.connections import Connection
+import asyncio
+import asyncmy
 from config.config import settings
-import time
 
 
-def get_connection(max_retries=5, delay=5) -> Connection:
-    for _ in range(max_retries):
+class Database:
+    pool = None
+
+
+async def init_db():
+    attempts = 0
+    while attempts < 5:
         try:
-            connection = connect(
-                user=settings.database_username,
-                password=settings.database_password,
+            Database.pool = await asyncmy.create_pool(
                 host=settings.database_hostname,
                 port=settings.database_port,
-                database=settings.database_name
+                user=settings.database_username,
+                password=settings.database_password,
+                db=settings.database_name,
+                minsize=5,  # Minimum number of connections in the pool
+                maxsize=10,  # Maximum number of connections in the pool
             )
-            return connection
-        except Error as e:
-            print(f"Error connecting to the database: {e}")
-            time.sleep(delay)
+            print("Database connection established successfully.")
+            return Database.pool
+        except Exception as e:
+            print(f"Failed to connect to database. Exception: {e}")
+            attempts += 1
+            await asyncio.sleep(5)
     raise Exception("Could not connect to the database after max retries")
 
+
+async def get_connection():
+    if Database.pool is None:
+        await init_db()
+    return Database.pool
