@@ -47,6 +47,8 @@ MariaDB relational database diagram:
 
 
 ## Usage
+In terminal use the command "uvicorn main:app --reload" to load up the application.
+
 The HTTP endpoints are listed in http://127.0.0.1:8000/docs 
 
 Refer to docstrings and typehints if you have questions regarding certain functionality.
