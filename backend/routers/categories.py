@@ -9,9 +9,9 @@ router_category = APIRouter(prefix="/categories", tags=["Categories"])
 
 
 @router_category.get("/")
-def get_categories(search: str | None = None, sort: str | None = None,
-                   skip: int | None = None, limit: int | None = None):
-    data = get_all()
+async def get_categories(search: str | None = None, sort: str | None = None,
+                         skip: int | None = None, limit: int | None = None):
+    data = await get_all()
     filtered_data = query_filters(data, key="name", search=search, sort=sort, skip=skip, limit=limit)
     return filtered_data
 

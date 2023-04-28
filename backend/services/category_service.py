@@ -6,8 +6,8 @@ from utils.oauth2 import get_current_user
 from services.user_service import is_admin, exists_by_id
 
 
-def get_all():
-    query = read_query("SELECT * FROM categories")
+async def get_all():
+    query = await read_query("SELECT * FROM categories")
     return [CategoryOut(id=category_id, name=name, private=private, locked=locked) for
             category_id, name, private, locked in
             query]
