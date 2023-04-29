@@ -27,7 +27,7 @@ async def get_category_by_id_with_topics(token: str, category_id: int):
             return UpdateStatus.NO_READ_ACCESS
 
     topic_data = await read_query("SELECT id, title FROM topics WHERE category_id = %s", (category_id,))
-    topics = [BaseTopic(id=id, title=title) for id, title in topic_data]
+    topics = [BaseTopic(id=topic_id, title=title) for topic_id, title in topic_data]
     return CategoryWithTopics(category=category_data, topics=topics)
 
 
@@ -47,31 +47,31 @@ async def delete(token: str, category_id: int) -> bool:
 async def update(token: str, category_id: int, category: Category) -> UpdateStatus:
     if await is_admin(token):
         updated_rows = await update_query("UPDATE categories SET name = %s WHERE id = %s", (category.name, category_id))
-        return _update_helper(updated_rows, category_id)
+        return await _update_helper(updated_rows, category_id)
 
 
 async def lock(token: str, category_id: int) -> UpdateStatus | None:
     if await is_admin(token):
         updated_rows = await update_query("UPDATE categories SET locked = 1 WHERE id = %s", (category_id,))
-        return _update_helper(updated_rows, category_id)
+        return await _update_helper(updated_rows, category_id)
 
 
 async def unlock(token: str, category_id: int) -> UpdateStatus:
     if await is_admin(token):
         updated_rows = await update_query("UPDATE categories SET locked = 0 WHERE id = %s", (category_id,))
-        return _update_helper(updated_rows, category_id)
+        return await _update_helper(updated_rows, category_id)
 
 
 async def make_private(token: str, category_id: int) -> UpdateStatus:
     if await is_admin(token):
         updated_rows = await update_query("UPDATE categories SET is_private = 1 WHERE id = %s", (category_id,))
-        return _update_helper(updated_rows, category_id)
+        return await _update_helper(updated_rows, category_id)
 
 
 async def make_non_private(token: str, category_id: int):
     if await is_admin(token):
         updated_rows = await update_query("UPDATE categories SET is_private = 0 WHERE id = %s", (category_id,))
-        return _update_helper(updated_rows, category_id)
+        return await _update_helper(updated_rows, category_id)
 
 
 async def view_privileged_users(token: str, category_id: int):
@@ -114,7 +114,7 @@ async def remove_user_as_private_member(token: str, category_id: int, user_id: i
     return UpdateStatus.SUCCESS
 
 
-def _update_helper(updated_rows: int, category_id: int) -> UpdateStatus:
+async def _update_helper(updated_rows: int, category_id: int) -> UpdateStatus:
     if updated_rows == 0:
         category = await category_exists(category_id)
         if category is None:
