@@ -1,7 +1,4 @@
-from enum import Enum
-
-
-class UpdateStatus(Enum):
+class UpdateStatus:
     DUPLICATE_ENTRY = "Already Exists"
     SUCCESS = "Success"
     NOT_FOUND = "Not found"
