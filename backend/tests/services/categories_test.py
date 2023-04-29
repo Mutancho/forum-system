@@ -1,3 +1,4 @@
+import asyncio
 from unittest import TestCase
 from unittest.mock import patch
 import services.category_service as cat_service
@@ -15,7 +16,8 @@ class TestCategoryService(TestCase):
             (3, "Category 3", False, True),
         ]
 
-        result = cat_service.get_all()
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.get_all())
 
         expected_result = [
             CategoryOut(id=1, name="Category 1", private=False, locked=False),
@@ -44,7 +46,8 @@ class TestGetCategoryByID_Should(TestCase):
         mock_category_read_restriction_applies.return_value = C.READ_ACCESS_DENIED
         mock_read_query.return_value = C.READ_QUERY_RETURN_VALUE_CATEGORY_WITH_TOPICS
 
-        result = cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1))
         self.assertIsInstance(result, CategoryWithTopics)
         self.assertEqual(result.category.name, C.CATEGORY_NAME_1)
         self.assertEqual(len(result.topics), 2)
@@ -67,7 +70,9 @@ class TestGetCategoryByID_Should(TestCase):
         mock_category_read_restriction_applies.return_value = C.READ_ACCESS_DENIED
         mock_read_query.return_value = C.READ_QUERY_RETURN_VALUE_CATEGORY_WITH_TOPICS
 
-        result = cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1))
+
         self.assertEqual(result, UpdateStatus.NO_READ_ACCESS)
 
     @patch("services.category_service.get_current_user")
@@ -86,7 +91,9 @@ class TestGetCategoryByID_Should(TestCase):
         mock_category_read_restriction_applies.return_value = C.READ_ACCESS_GRANTED
         mock_read_query.return_value = C.READ_QUERY_RETURN_VALUE_CATEGORY_WITH_TOPICS
 
-        result = cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1))
+
         self.assertIsInstance(result, CategoryWithTopics)
         self.assertEqual(result.category.name, C.CATEGORY_NAME_1)
         self.assertEqual(len(result.topics), 2)
@@ -109,7 +116,9 @@ class TestGetCategoryByID_Should(TestCase):
         mock_category_read_restriction_applies.return_value = C.READ_ACCESS_DENIED
         mock_read_query.return_value = C.READ_QUERY_RETURN_VALUE_CATEGORY_WITH_TOPICS
 
-        result = cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.get_category_by_id_with_topics(C.TOKEN, C.CATEGORY_ID_1))
+
         self.assertIsInstance(result, CategoryWithTopics)
         self.assertEqual(result.category.name, C.CATEGORY_NAME_1)
         self.assertEqual(len(result.topics), 2)
@@ -132,7 +141,9 @@ class TestGetCategoryByID_Should(TestCase):
         mock_category_read_restriction_applies.return_value = C.READ_ACCESS_DENIED
         mock_read_query.return_value = C.READ_QUERY_RETURN_VALUE_CATEGORY_WITH_TOPICS
 
-        result = cat_service.get_category_by_id_with_topics(C.TOKEN, C.INVALID_CATEGORY_ID)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.get_category_by_id_with_topics(C.TOKEN, C.INVALID_CATEGORY_ID))
+
         self.assertEqual(result, UpdateStatus.NOT_FOUND)
 
 
@@ -148,7 +159,8 @@ class TestCreate_Should(TestCase):
         mock_insert_query.return_value = 1
 
         token = C.TOKEN
-        created_category = cat_service.create(token, self.sample_category)
+        loop = asyncio.get_event_loop()
+        created_category = loop.run_until_complete(cat_service.create(token, self.sample_category))
 
         self.assertEqual(created_category.id, C.CATEGORY_ID_1)
         self.assertEqual(created_category.name, C.CATEGORY_NAME_1)
@@ -158,7 +170,8 @@ class TestCreate_Should(TestCase):
         mock_is_admin.return_value = False
 
         token = C.TOKEN
-        created_category = cat_service.create(token, self.sample_category)
+        loop = asyncio.get_event_loop()
+        created_category = loop.run_until_complete(cat_service.create(token, self.sample_category))
 
         self.assertIsNone(created_category)
         mock_is_admin.assert_called_once_with(token)
@@ -173,7 +186,8 @@ class TestDelete_Should(TestCase):
 
         token = C.TOKEN
         category_id = C.CATEGORY_ID_1
-        result = cat_service.delete(token, category_id)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.delete(token, category_id))
 
         self.assertTrue(result)
         mock_is_admin.assert_called_once_with(token)
@@ -184,7 +198,8 @@ class TestDelete_Should(TestCase):
 
         token = C.TOKEN
         category_id = C.CATEGORY_ID_1
-        result = cat_service.delete(token, category_id)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.delete(token, category_id))
 
         self.assertFalse(result)
         mock_is_admin.assert_called_once_with(token)
@@ -197,7 +212,8 @@ class TestDelete_Should(TestCase):
 
         token = C.TOKEN
         category_id = C.CATEGORY_ID_1
-        result = cat_service.delete(token, category_id)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.delete(token, category_id))
 
         self.assertFalse(result)
         mock_is_admin.assert_called_once_with(token)
@@ -213,7 +229,8 @@ class TestCategoryUpdate_Should(TestCase):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 1
 
-        result = cat_service.update(token, category_id, category)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.update(token, category_id, category))
 
         self.assertEqual(result, UpdateStatus.SUCCESS)
         mock_is_admin.assert_called_once_with(token)
@@ -222,27 +239,27 @@ class TestCategoryUpdate_Should(TestCase):
 class TestCategoryLock_Should(TestCase):
     @patch("services.category_service.is_admin")
     @patch("services.category_service.update_query")
-    def test_lock_success(self, mock_update_query, mock_is_admin):
+    async def test_lock_success(self, mock_update_query, mock_is_admin):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 1
 
-        result = cat_service.lock(C.TOKEN, C.CATEGORY_ID_1)
+        result = await cat_service.lock(C.TOKEN, C.CATEGORY_ID_1)
         self.assertEqual(result, UpdateStatus.SUCCESS)
 
     @patch("services.category_service.is_admin")
     @patch("services.category_service.update_query")
-    def test_lock_not_found(self, mock_update_query, mock_is_admin):
+    async def test_lock_not_found(self, mock_update_query, mock_is_admin):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 0
 
-        result = cat_service.lock(C.TOKEN, C.INVALID_CATEGORY_ID)
+        result = await cat_service.lock(C.TOKEN, C.INVALID_CATEGORY_ID)
         self.assertEqual(result, UpdateStatus.NOT_FOUND)
 
     @patch("services.category_service.is_admin")
-    def test_lock_not_admin(self, mock_is_admin):
+    async def test_lock_not_admin(self, mock_is_admin):
         mock_is_admin.return_value = False
 
-        result = cat_service.lock(C.TOKEN, C.CATEGORY_ID_1)
+        result = await cat_service.lock(C.TOKEN, C.CATEGORY_ID_1)
         self.assertIsNone(result)
 
 
@@ -253,7 +270,8 @@ class TestUnlockCategory_Should(TestCase):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 1
 
-        result = cat_service.unlock(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.unlock(C.TOKEN, C.CATEGORY_ID_1))
         self.assertEqual(result, UpdateStatus.SUCCESS)
 
     @patch("services.category_service.is_admin")
@@ -262,14 +280,16 @@ class TestUnlockCategory_Should(TestCase):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 0
 
-        result = cat_service.unlock(C.TOKEN, C.INVALID_CATEGORY_ID)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.unlock(C.TOKEN, C.INVALID_CATEGORY_ID))
         self.assertEqual(result, UpdateStatus.NOT_FOUND)
 
     @patch("services.category_service.is_admin")
     def test_unlock_not_admin(self, mock_is_admin):
         mock_is_admin.return_value = False
 
-        result = cat_service.unlock(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.unlock(C.TOKEN, C.CATEGORY_ID_1))
         self.assertIsNone(result)
 
 
@@ -280,7 +300,8 @@ class TestMakePrivateCategory_Should(TestCase):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 1
 
-        result = cat_service.make_private(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.make_private(C.TOKEN, C.CATEGORY_ID_1))
         self.assertEqual(result, UpdateStatus.SUCCESS)
 
     @patch("services.category_service.is_admin")
@@ -289,14 +310,16 @@ class TestMakePrivateCategory_Should(TestCase):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 0
 
-        result = cat_service.make_private(C.TOKEN, C.INVALID_CATEGORY_ID)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.make_private(C.TOKEN, C.INVALID_CATEGORY_ID))
         self.assertEqual(result, UpdateStatus.NOT_FOUND)
 
     @patch("services.category_service.is_admin")
     def test_make_private_not_admin(self, mock_is_admin):
         mock_is_admin.return_value = False
 
-        result = cat_service.make_private(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.make_private(C.TOKEN, C.CATEGORY_ID_1))
         self.assertIsNone(result)
 
 
@@ -307,7 +330,9 @@ class TestMakeNonPrivateCategory_Should(TestCase):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 1
 
-        result = cat_service.make_non_private(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.make_non_private(C.TOKEN, C.CATEGORY_ID_1))
+
         self.assertEqual(result, UpdateStatus.SUCCESS)
 
     @patch("services.category_service.is_admin")
@@ -316,14 +341,16 @@ class TestMakeNonPrivateCategory_Should(TestCase):
         mock_is_admin.return_value = True
         mock_update_query.return_value = 0
 
-        result = cat_service.make_non_private(C.TOKEN, C.INVALID_CATEGORY_ID)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.make_non_private(C.TOKEN, C.INVALID_CATEGORY_ID))
         self.assertEqual(result, UpdateStatus.NOT_FOUND)
 
     @patch("services.category_service.is_admin")
     def test_make_non_private_not_admin(self, mock_is_admin):
         mock_is_admin.return_value = False
 
-        result = cat_service.make_non_private(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.make_non_private(C.TOKEN, C.CATEGORY_ID_1))
         self.assertIsNone(result)
 
 
@@ -334,14 +361,16 @@ class TestViewPrivilegedUsers_Should(TestCase):
         mock_is_admin.return_value = True
         mock_read_query.return_value = []
 
-        result = cat_service.view_privileged_users(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.view_privileged_users(C.TOKEN, C.CATEGORY_ID_1))
         self.assertEqual(len(result), 0)
 
     @patch("services.category_service.is_admin")
     def test_view_privileged_users_not_admin(self, mock_is_admin):
         mock_is_admin.return_value = False
 
-        result = cat_service.view_privileged_users(C.TOKEN, C.CATEGORY_ID_1)
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(cat_service.view_privileged_users(C.TOKEN, C.CATEGORY_ID_1))
         self.assertIsNone(result)
 
 
@@ -351,50 +380,51 @@ class TestAddUserAsPrivateMember_Should(TestCase):
     @patch("services.category_service.is_admin")
     @patch("services.category_service.read_query")
     @patch("services.category_service.insert_query")
-    def test_add_user_as_private_member_success(self, mock_insert_query, mock_read_query, mock_is_admin,
-                                                mock_category_exists, mock_exists_by_id):
+    async def test_add_user_as_private_member_success(self, mock_insert_query, mock_read_query, mock_is_admin,
+                                                      mock_category_exists, mock_exists_by_id):
         mock_is_admin.return_value = True
         mock_category_exists.return_value = True
         mock_exists_by_id.return_value = True
         mock_read_query.return_value = []
 
-        result = cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+        result = await cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
         self.assertEqual(result, UpdateStatus.SUCCESS)
 
     @patch("services.category_service.exists_by_id")
     @patch("services.category_service.category_exists")
     @patch("services.category_service.is_admin")
     @patch("services.category_service.read_query")
-    def test_add_user_as_private_member_duplicate_entry(self, mock_read_query, mock_is_admin,
-                                                        mock_category_exists, mock_exists_by_id):
+    async def test_add_user_as_private_member_duplicate_entry(self, mock_read_query, mock_is_admin,
+                                                              mock_category_exists, mock_exists_by_id):
         mock_is_admin.return_value = True
         mock_category_exists.return_value = True
         mock_exists_by_id.return_value = True
         mock_read_query.return_value = [(C.USER_ID_1, C.CATEGORY_ID_1, 1)]
 
-        result = cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+        result = await cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
         self.assertEqual(result, UpdateStatus.DUPLICATE_ENTRY)
 
     @patch("services.category_service.exists_by_id")
     @patch("services.category_service.category_exists")
     @patch("services.category_service.is_admin")
-    def test_add_user_as_private_member_not_found(self, mock_is_admin, mock_category_exists, mock_exists_by_id):
+    async def test_add_user_as_private_member_not_found(self, mock_is_admin, mock_category_exists, mock_exists_by_id):
         mock_is_admin.return_value = True
         mock_category_exists.return_value = False
         mock_exists_by_id.return_value = True
 
-        result = cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+        result = await cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
         self.assertEqual(result, UpdateStatus.NOT_FOUND)
 
     @patch("services.category_service.exists_by_id")
     @patch("services.category_service.category_exists")
     @patch("services.category_service.is_admin")
-    def test_add_user_as_private_member_admin_required(self, mock_is_admin, mock_category_exists, mock_exists_by_id):
+    async def test_add_user_as_private_member_admin_required(self, mock_is_admin, mock_category_exists,
+                                                             mock_exists_by_id):
         mock_is_admin.return_value = False
         mock_category_exists.return_value = True
         mock_exists_by_id.return_value = True
 
-        result = cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+        result = await cat_service.add_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
         self.assertEqual(result, UpdateStatus.ADMIN_REQUIRED)
 
 
@@ -403,37 +433,39 @@ class TestRemoveUserAsPrivateMember_Should(TestCase):
     @patch("services.category_service.category_exists")
     @patch("services.category_service.is_admin")
     @patch("services.category_service.update_query")
-    def test_remove_user_as_private_member_success(self, mock_update_query, mock_is_admin,
-                                                   mock_category_exists, mock_exists_by_id):
+    async def test_remove_user_as_private_member_success(self, mock_update_query, mock_is_admin,
+                                                         mock_category_exists, mock_exists_by_id):
         mock_is_admin.return_value = True
         mock_category_exists.return_value = True
         mock_exists_by_id.return_value = True
         mock_update_query.return_value = 1
 
-        result = cat_service.remove_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+        result = await cat_service.remove_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
         self.assertEqual(result, UpdateStatus.SUCCESS)
 
     @patch("services.category_service.exists_by_id")
     @patch("services.category_service.category_exists")
     @patch("services.category_service.is_admin")
     @patch("services.category_service.update_query")
-    def test_remove_user_as_private_member_not_found(self, mock_update_query, mock_is_admin,
-                                                     mock_category_exists, mock_exists_by_id):
+    async def test_remove_user_as_private_member_not_found(self, mock_update_query, mock_is_admin,
+                                                           mock_category_exists, mock_exists_by_id):
         mock_is_admin.return_value = True
         mock_category_exists.return_value = True
         mock_exists_by_id.return_value = True
         mock_update_query.return_value = 0
 
-        result = cat_service.remove_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+        result = await cat_service.remove_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
         self.assertEqual(result, UpdateStatus.NOT_FOUND)
 
     @patch("services.category_service.exists_by_id")
     @patch("services.category_service.category_exists")
     @patch("services.category_service.is_admin")
-    def test_remove_user_as_private_member_admin_required(self, mock_is_admin, mock_category_exists, mock_exists_by_id):
+    async def test_remove_user_as_private_member_admin_required(self, mock_is_admin, mock_category_exists,
+                                                                mock_exists_by_id):
         mock_is_admin.return_value = False
         mock_category_exists.return_value = True
         mock_exists_by_id.return_value = True
 
-        result = cat_service.remove_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+        result = await cat_service.remove_user_as_private_member(C.TOKEN, C.CATEGORY_ID_1, C.USER_ID_1)
+
         self.assertEqual(result, UpdateStatus.ADMIN_REQUIRED)
