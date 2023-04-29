@@ -17,10 +17,9 @@ async def init_db():
                 user=settings.database_username,
                 password=settings.database_password,
                 db=settings.database_name,
-                minsize=5,  # Minimum number of connections in the pool
+                minsize=1,  # Minimum number of connections in the pool
                 maxsize=10,  # Maximum number of connections in the pool
             )
-            print("Database connection established successfully.")
             return Database.pool
         except Exception as e:
             print(f"Failed to connect to database. Exception: {e}")
@@ -32,4 +31,6 @@ async def init_db():
 async def get_connection():
     if Database.pool is None:
         await init_db()
-    return Database.pool
+    # acquire a single connection from the pool
+    async with Database.pool.acquire() as conn:
+        return conn
