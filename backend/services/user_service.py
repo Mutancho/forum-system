@@ -53,8 +53,8 @@ def exists_by_username_email(user: User):
     return len(data) > 0
 
 
-def exists_by_id(id: int):
-    data = read_query('''SELECT id FROM users WHERE id = ?''',
+async def exists_by_id(id: int):
+    data = await read_query('''SELECT id FROM users WHERE id = %s''',
                       (id,))
 
     return len(data) > 0
@@ -119,9 +119,9 @@ def is_user_authorized_to_get_delete(token: str, id: int):
     return user_id == id or role.lower() == 'admin'
 
 
-def is_admin(token: str):
+async def is_admin(token: str):
     user_id = oauth2.get_current_user(token)
-    data = read_query('''SELECT role FROM users WHERE id = ?''',
+    data = await read_query('''SELECT role FROM users WHERE id = %s''',
                       (user_id,))
     role = data[0][0]
     return role.lower() == 'admin'
