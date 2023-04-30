@@ -127,7 +127,6 @@ async def topic_exists(topic_id: int) -> TopicWithBestReply | None:
     data = await read_query("SELECT id, title, content, best_reply_id, locked FROM topics where id = %s", (topic_id,))
     if not data:
         return None
-    print(data)
     return TopicWithBestReply(id=data[0][0], title=data[0][1], content=data[0][2], best_reply_id=data[0][3],
                               locked=data[0][4])
 
@@ -158,3 +157,8 @@ async def is_topic_owner(topic_id, token):
 
 async def is_topic_locked(topic_id: int):
     return await read_query("SELECT locked FROM topics WHERE id = %s", (topic_id,))
+
+
+async def delete_topic_has_best_reply(topic_id: int):
+    if await read_query("SELECT best_reply_id FROM topics where id = %s", (topic_id,)):
+        return await update_query("UPDATE topics SET best_reply_id = NULL where id = %s", (topic_id,))
