@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 from schemas.message import Message
 from schemas.user import DisplayUser
-import asyncio
+from asyncio import run
 
 from services import message_service
 
@@ -24,7 +24,7 @@ class UserService_Should(unittest.TestCase):
                 self.assertEqual(1, result.id)
                 self.assertEqual(('2023-04-14',), result.created_at)
 
-        asyncio.run(async_test())
+        run(async_test())
 
     @patch('services.message_service.read_query', autospec=True)
     def test_getAllMyConversations_returnsListOfDisplayUser(self, mock_read_query):
@@ -46,7 +46,7 @@ class UserService_Should(unittest.TestCase):
                         DisplayUser(id=2, username='username2', email='email@us2.com')]
             self.assertEqual(expected, list(result))
 
-        asyncio.run(async_test())
+        run(async_test())
 
     @patch('services.message_service.read_query', autospec=True)
     def test_getAllMyConversationsWith_returnsDictOfMessages(self, mock_read_query):
@@ -64,4 +64,4 @@ class UserService_Should(unittest.TestCase):
 
             self.assertEqual(expected, result)
 
-        asyncio.run(async_test())
+        run(async_test())
