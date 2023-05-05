@@ -77,7 +77,7 @@ async def login(credentials: EmailLogin | UsernameLogin):
 async def give_access(member_access: Member, Authorization: str = Header()):
     # todo test to ensure it works
     token = Authorization[8:-1]
-    if not user_service.is_admin(token):
+    if not await user_service.is_admin(token):
         return Response(status_code=403)
     if not await user_service.exists_by_id(member_access.user_id):
         return Response(status_code=400, content=f'User with id: {member_access.user_id} does not exist!')
@@ -90,10 +90,9 @@ async def give_access(member_access: Member, Authorization: str = Header()):
 
 @router_user.put('/revoke_access')
 async def revoke_access(member_access: RevokeMemberAccess, Authorization: str = Header()):
-    print(32)
     # todo test to ensure it works
     token = Authorization[8:-1]
-    if not user_service.is_admin(token):
+    if not await user_service.is_admin(token):
         return Response(status_code=403)
     if not await user_service.exists_by_id(member_access.user_id):
         return Response(status_code=400, content=f'User with id: {member_access.user_id} does not exist!')
