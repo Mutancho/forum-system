@@ -24,4 +24,4 @@ urllib3==1.26.15
 uvicorn==0.21.1
 asyncmy~=0.2.7
 aiobcrypt~=3.2.0.post1
-gunicorn
+gunicorn==20.1.0
