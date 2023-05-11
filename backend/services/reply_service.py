@@ -1,8 +1,8 @@
 import datetime
-from database.database_queries import read_query, insert_query, update_query
-from services.validations import UpdateStatus
-from schemas.reply import ReplyWithUserAndTopic, Vote, Reply, UpdateReply
-from utils import oauth2
+from backend.database.database_queries import read_query, insert_query, update_query
+from backend.services.validations import UpdateStatus
+from backend.schemas.reply import ReplyWithUserAndTopic, Vote, Reply, UpdateReply
+from backend.utils import oauth2
 
 
 async def get_by_id(reply_id: int):

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, Response, Header
-from services import reply_service, category_service, topic_service, user_service
-from schemas.reply import BaseReply, Vote, Reply, UpdateReply
-from routers.helper_functions import query_filters
+from backend.services import reply_service, category_service, topic_service, user_service
+from backend.schemas.reply import BaseReply, Vote, Reply, UpdateReply
+from backend.routers.helper_functions import query_filters
 
 router_reply = APIRouter(prefix="/categories/{category_id}/topics/{topic_id}/replies", tags=["Replies"])
 

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Response, Header
 from fastapi.security import OAuth2PasswordBearer
-from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
-from services import user_service, category_service
-from services.user_service import is_admin
-from utils import oauth2
+from backend.schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
+from backend.services import user_service, category_service
+from backend.services.user_service import is_admin
+from backend.utils import oauth2
 
 router_user = APIRouter(prefix='/users', tags=['Users'])
 

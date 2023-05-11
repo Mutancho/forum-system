@@ -1,12 +1,12 @@
-from database.database_queries import read_query, insert_query, update_query
-from schemas.topic import TopicWithUserAndCategoryWithContent, TopicWithContent, TopicWithReplies, TopicBestReply, \
+from backend.database.database_queries import read_query, insert_query, update_query
+from backend.schemas.topic import TopicWithUserAndCategoryWithContent, TopicWithContent, TopicWithReplies, TopicBestReply, \
     TopicsTimeStamps, TopicWithBestReply
-from schemas.reply import BaseReply
-from services.user_service import is_admin
-from services.validations import UpdateStatus
-from services.reply_service import exists_by_id
-from utils.oauth2 import get_current_user
-from services.category_service import is_category_private, category_read_restriction_applies, category_exists, \
+from backend.schemas.reply import BaseReply
+from backend.services.user_service import is_admin
+from backend.services.validations import UpdateStatus
+from backend.services.reply_service import exists_by_id
+from backend.utils.oauth2 import get_current_user
+from backend.services.category_service import is_category_private, category_read_restriction_applies, category_exists, \
     category_write_restriction_applies, is_category_locked
 
 

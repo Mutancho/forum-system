@@ -1,7 +1,7 @@
-from utils import oauth2
-from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
-from database.database_queries import insert_query, read_query, update_query
-from utils.passwords import hash_password, verify_password
+from backend.utils import oauth2
+from backend.schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
+from backend.database.database_queries import insert_query, read_query, update_query
+from backend.utils.passwords import hash_password, verify_password
 
 
 async def all():

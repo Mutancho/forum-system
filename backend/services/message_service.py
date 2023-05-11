@@ -1,7 +1,7 @@
-from schemas.message import Message
-from database.database_queries import insert_query, read_query
-from schemas.user import DisplayUser
-from utils import oauth2
+from backend.schemas.message import Message
+from backend.database.database_queries import insert_query, read_query
+from backend.schemas.user import DisplayUser
+from backend.utils import oauth2
 
 
 async def create(message: Message):

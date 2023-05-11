@@ -1,7 +1,7 @@
 from jose import jwt, JWTError
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import Depends, HTTPException, status
-from config.config import settings
+from backend.config.config import settings
 from datetime import timedelta, datetime
 
 oath2_scheme = OAuth2PasswordBearer(tokenUrl='login')

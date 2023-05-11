@@ -1,6 +1,6 @@
 import asyncio
 import asyncmy
-from config.config import settings
+from backend.config.config import settings
 
 
 class Database:

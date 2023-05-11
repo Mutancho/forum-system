@@ -1,5 +1,5 @@
 from enum import Enum
-from services.validations import UpdateStatus
+from backend.services.validations import UpdateStatus
 from fastapi import HTTPException, status
 
 

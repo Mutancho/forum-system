@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Header
-from services.topic_service import create, lock, unlock, get_topic_by_id_with_replies, delete, update, set_best_reply, \
+from backend.services.topic_service import create, lock, unlock, get_topic_by_id_with_replies, delete, update, set_best_reply, \
     get_all
-from schemas.topic import TopicWithUserAndCategoryWithContent, TopicWithContent, TopicBestReply
-from routers.helper_functions import http_validations, Constants as C, query_filters
-from utils.oauth2 import get_current_user
+from backend.schemas.topic import TopicWithUserAndCategoryWithContent, TopicWithContent, TopicBestReply
+from backend.routers.helper_functions import http_validations, Constants as C, query_filters
+from backend.utils.oauth2 import get_current_user
 
 router_topic = APIRouter(prefix="/categories/{category_id}/topics", tags=["Topics"])
 router_all_topics = APIRouter(tags=["Topics"])

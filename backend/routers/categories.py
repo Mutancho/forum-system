@@ -1,9 +1,9 @@
 from fastapi import APIRouter, status, HTTPException, Header
-from services.category_service import (get_all, create, update, delete, get_category_by_id_with_topics,
+from backend.services.category_service import (get_all, create, update, delete, get_category_by_id_with_topics,
                                        lock, unlock, make_private, make_non_private, view_privileged_users,
                                        add_user_as_private_member, remove_user_as_private_member)
-from schemas.category import Category
-from routers.helper_functions import query_filters, http_validations, Constants
+from backend.schemas.category import Category
+from backend.routers.helper_functions import query_filters, http_validations, Constants
 
 router_category = APIRouter(prefix="/categories", tags=["Categories"])
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Response, Header
 from fastapi.security import OAuth2PasswordBearer
-from schemas.message import Message
-from services import message_service, user_service
-from utils import oauth2
+from backend.schemas.message import Message
+from backend.services import message_service, user_service
+from backend.utils import oauth2
 
 router_message = APIRouter(prefix='/messages', tags=['Messages'])
 

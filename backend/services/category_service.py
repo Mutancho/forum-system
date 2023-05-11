@@ -1,9 +1,9 @@
-from database.database_queries import read_query, insert_query, update_query
-from schemas.category import Category, CategoryWithTopics, PrivilegedCategoryUsers, CategoryOut
-from schemas.topic import BaseTopic
-from services.validations import UpdateStatus
-from utils.oauth2 import get_current_user
-from services.user_service import is_admin, exists_by_id
+from backend.database.database_queries import read_query, insert_query, update_query
+from backend.schemas.category import Category, CategoryWithTopics, PrivilegedCategoryUsers, CategoryOut
+from backend.schemas.topic import BaseTopic
+from backend.services.validations import UpdateStatus
+from backend.utils.oauth2 import get_current_user
+from backend.services.user_service import is_admin, exists_by_id
 
 
 async def get_all():

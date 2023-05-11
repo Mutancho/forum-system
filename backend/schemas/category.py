@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from schemas.topic import BaseTopic
+from backend.schemas.topic import BaseTopic
 
 
 class Category(BaseModel):

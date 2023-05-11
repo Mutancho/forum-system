@@ -1,4 +1,4 @@
-from database.connection import Database, init_db
+from backend.database.connection import Database, init_db
 
 
 async def read_query(sql: str, sql_params=()) -> list:
