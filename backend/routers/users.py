@@ -86,15 +86,14 @@ async def give_access(member_access: Member, Authorization: str = Header()):
     return Response(status_code=200)
 
 
-@router_user.put('/revoke_access')
-async def revoke_access(member_access: RevokeMemberAccess, Authorization: str = Header()):
-    # todo test to ensure it works
+@router_user.post('/revoke_access')
+async def revoke_access(member_access: RevokeMemberAccess,Authorization:str = Header()):
     token = Authorization[8:-1]
     if not await user_service.is_admin(token):
         return Response(status_code=403)
     if not await user_service.exists_by_id(member_access.user_id):
-        return Response(status_code=400, content=f'User with id: {member_access.user_id} does not exist!')
-    if not await user_service.user_has_permissions_for_category(member_access.user_id, member_access.category_id):
+        return Response(status_code=400,content=f'User with id: {member_access.user_id} does not exist!')
+    if not await user_service.user_has_permissions_for_category(member_access.user_id,member_access.category_id):
         return Response(status_code=404)
 
     await user_service.revoke_access(member_access)
