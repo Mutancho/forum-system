@@ -18,9 +18,9 @@ async def get_all_my_conversations(token: str) -> list[DisplayUser]:
     id = oauth2.get_current_user(token)
     data = await read_query('''SELECT receiver_id FROM messages WHERE sender_id = %s ''', (id,))
     data += await read_query('''SELECT sender_id FROM messages WHERE receiver_id  = %s ''', (id,))
-    ids = ','.join(str(id[0]) for id in set(data))
-    users = await read_query(
-        f'''SELECT id, username, email, password, role, created_at FROM users WHERE id in ({ids})''')
+    ids = ','.join(str(identifire[0]) for identifire in set(data))
+
+    users = await read_query(f'''SELECT id, username, email, password, role, created_at FROM users WHERE id in ('{ids}')''')
     return [DisplayUser.from_query_result(*u) for u in users]
 
 

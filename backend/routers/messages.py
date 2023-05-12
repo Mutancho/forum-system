@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Response, Header
-from fastapi.security import OAuth2PasswordBearer
 from schemas.message import Message
 from services import message_service, user_service
 from utils import oauth2
@@ -23,7 +22,7 @@ async def get_conversations(Authorization: str = Header()):
     return await message_service.get_all_my_conversations(token)
 
 
-@router_message.get('/conversation/{id}')
+@router_message.get('/conversations/{id}')
 async def get_conversations_with(id: int, Authorization: str = Header()):
     token = Authorization[8:-1]
     if not await user_service.exists_by_id(id):
