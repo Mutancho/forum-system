@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Response, Header
-from fastapi.security import OAuth2PasswordBearer
 from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
 from services import user_service, category_service
 from services.user_service import is_admin
@@ -41,7 +40,7 @@ async def update_user(id: int, user: UpdateUser, Authorization: str = Header()):
     user_id = oauth2.get_current_user(token)
     if not await user_service.exists_by_id(id):
         return Response(status_code=404)
-    if id != user_id or not is_admin(user_id):
+    if id != user_id or not await is_admin(token):
         return Response(status_code=403)
     if await user_service.check_unique_update_email_password(id, user):
         return Response(status_code=400, content=f'A User with this username or email already exists!')
@@ -75,7 +74,6 @@ async def login(credentials: EmailLogin | UsernameLogin):
 
 @router_user.post('/give_access')
 async def give_access(member_access: Member, Authorization: str = Header()):
-    # todo test to ensure it works
     token = Authorization[8:-1]
     if not await user_service.is_admin(token):
         return Response(status_code=403)

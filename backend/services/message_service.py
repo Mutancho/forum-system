@@ -24,8 +24,7 @@ async def get_all_my_conversations(token: str) -> list[DisplayUser]:
     return [DisplayUser.from_query_result(*u) for u in users]
 
 
-async def get_all_my_conversations_with(token: str,
-                                        receiver_id: int):  # The formating needs to be fixed so JSON displayes it as intended
+async def get_all_my_conversations_with(token: str,receiver_id: int):
     auth_user_id = oauth2.get_current_user(token)
     data = await read_query('''SELECT sender_id,content,created_at,receiver_id FROM messages WHERE (sender_id=%s and receiver_id = %s) or 
     (receiver_id = %s and sender_id = %s) ORDER BY created_at''',
