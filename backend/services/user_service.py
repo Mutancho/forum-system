@@ -68,9 +68,7 @@ async def login(credentials: EmailLogin | UsernameLogin):
         data = await read_query('''SELECT id,username,email,password FROM users WHERE username = %s''',
                                 (credentials.username,))
     id = data[0][0]
-    username = data[0][1]
-    email = data[0][2]
-    password = credentials.password
+
 
     return oauth2.create_access_token(id)
 

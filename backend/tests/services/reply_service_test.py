@@ -1,7 +1,7 @@
 from datetime import datetime, date
 import unittest
-from unittest.mock import Mock, create_autospec, patch
-from schemas.reply import ReplyWithUserAndTopic, Vote, Reply, UpdateReply
+from unittest.mock import Mock, patch
+from schemas.reply import  Vote, Reply, UpdateReply
 from services import reply_service
 from asyncio import run
 

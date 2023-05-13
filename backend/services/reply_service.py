@@ -1,7 +1,6 @@
-import datetime
+
 from database.database_queries import read_query, insert_query, update_query
-from services.validations import UpdateStatus
-from schemas.reply import ReplyWithUserAndTopic, Vote, Reply, UpdateReply
+from schemas.reply import Vote, Reply, UpdateReply
 from utils import oauth2
 
 

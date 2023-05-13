@@ -1,7 +1,8 @@
-from fastapi import APIRouter, status, HTTPException, Response, Header
+from fastapi import APIRouter, Response, Header
 from services import reply_service, category_service, topic_service, user_service
-from schemas.reply import BaseReply, Vote, Reply, UpdateReply
-from routers.helper_functions import query_filters
+from schemas.reply import  Vote, Reply, UpdateReply
+from utils.oauth2 import get_current_user
+
 
 router_reply = APIRouter(prefix="/categories/{category_id}/topics/{topic_id}/replies", tags=["Replies"])
 
@@ -9,12 +10,15 @@ router_reply = APIRouter(prefix="/categories/{category_id}/topics/{topic_id}/rep
 @router_reply.get("/{id}")
 async def get_reply_by_id(category_id: int, topic_id: int, id: int, Authorization: str = Header()):
     token = Authorization[8:-1]
+    if not get_current_user(token):
+        return Response(status_code=403)
     if await category_service.category_exists(category_id) is None:
         return Response(status_code=404, content="Category Not Found")
     if await topic_service.get_topic_by_id(topic_id) is None:
         return Response(status_code=404, content="Topic Not Found")
     if not await reply_service.exists_by_id(id):
         return Response(status_code=404, content='Reply Not Found')
+
 
     return await reply_service.get_by_id(id)
 
@@ -33,6 +37,8 @@ async def create_reply(category_id: int, topic_id: int, reply: Reply, Authorizat
 @router_reply.put('/{id}')
 async def update_reply(category_id: int, topic_id: int, id: int, reply: UpdateReply, Authorization: str = Header()):
     token = Authorization[8:-1]
+    if not await reply_service.is_reply_owner(id, token):
+        return Response(status_code=403)
     if await category_service.category_exists(category_id) is None:
         return Response(status_code=404, content="Category Not Found")
     if await topic_service.get_topic_by_id(topic_id) is None:
