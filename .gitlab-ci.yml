@@ -31,8 +31,16 @@ before_script:
   - pip3 install requests
   - pip3 install python-dotenv
 
-test:
-  script:
-      - python3 -m unittest
+stages:
+  - test
+
+unit-test:
+    stage: test 
+    image: python:latest
+    script:
+         - python3 -m unittest
+    
+
+
 
 
