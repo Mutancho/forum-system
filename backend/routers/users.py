@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Response, Header
-from fastapi.security import OAuth2PasswordBearer
 from schemas.user import User, EmailLogin, UsernameLogin, Member, RevokeMemberAccess, UpdateUser
 from services import user_service, category_service
 from services.user_service import is_admin
@@ -75,7 +74,6 @@ async def login(credentials: EmailLogin | UsernameLogin):
 
 @router_user.post('/give_access')
 async def give_access(member_access: Member, Authorization: str = Header()):
-    # todo test to ensure it works
     token = Authorization[8:-1]
     if not await user_service.is_admin(token):
         return Response(status_code=403)

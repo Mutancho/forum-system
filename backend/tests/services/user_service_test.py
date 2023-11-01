@@ -234,6 +234,7 @@ class UserService_Should(unittest.TestCase):
 
             result = await user_service.verify_credentials(email_login)
             self.assertEqual(False, result)
+            run(async_test())
 
     @patch('services.user_service.read_query', autospec=True)
     def test_verifyCredentials_returnsFalse_when_UsernameLogin_exists(self, mock_read_query):
