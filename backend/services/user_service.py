@@ -78,7 +78,7 @@ async def login(credentials: EmailLogin | UsernameLogin):
 async def give_access(member_access: Member):
     read_access = int(member_access.read_access)
     write_access = int(member_access.write_access)
-    if user_has_permissions_for_category(member_access.user_id, member_access.category_id):
+    if await user_has_permissions_for_category(member_access.user_id, member_access.category_id):
         await update_query(
             '''UPDATE categorymembers SET read_access = %s,write_access = %s  Where user_id = %s and category_id = %s''',
             (read_access, write_access, member_access.user_id, member_access.category_id))
