@@ -1,7 +1,8 @@
-import datetime
+from enum import Enum
 
 from pydantic import BaseModel, constr
 from datetime import date
+
 
 class Reply(BaseModel):
     id: int | None
@@ -13,8 +14,10 @@ class Reply(BaseModel):
     def from_query_result(cls, id, content, created_at, updated_at):
         return cls(id=id, content=content, updated_at=updated_at, created_at=created_at)
 
+
 class UpdateReply(BaseModel):
     content: constr(min_length=1)
+
 
 class BaseReply(BaseModel):
     id: int | None
@@ -30,5 +33,11 @@ class ReplyWithUserAndTopic(ReplyTimeStamps):
     user_id: int
     topic_id: int
 
+
+class VoteType(str, Enum):
+    UPVOTE = "upvote"
+    DOWNVOTE = "downvote"
+
+
 class Vote(BaseModel):
-    vote: constr(regex='(?i)^(upvote|downvote)$')
+    vote: VoteType
