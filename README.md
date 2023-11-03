@@ -39,6 +39,10 @@ SECRET_KEY
 ALGORITHM= eg. "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES="enter integer for minutes"
 
+Navigate to the root folder and create a file named `mariadb.env`. This file will hold environment variables specific to your MariaDB container setup:
+- `MYSQL_ROOT_PASSWORD`: The password for the root user of your MariaDB instance. Ensure this is a strong, unique password.
+- `MYSQL_DATABASE`: The name of the database that MariaDB will initially create upon container startup. This should ideally match the `DATABASE_NAME` from the `.env` file in the `backend/config` directory.
+
 When you provide an authorization token go to the authorisation tab in postman and there you should select bearer token, enclosed in quotation marks. 
 
 
