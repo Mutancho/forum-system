@@ -3,12 +3,12 @@ from pydantic import BaseModel, constr, EmailStr
 
 
 class User(BaseModel):
-    id: int | None
+    id: int | None = None
     username: str
     email: EmailStr
     password: constr(min_length=6)
     role: str
-    created_at: date | None
+    created_at: date | None = None
 
     @classmethod
     def from_query_result(cls, id, username, email, role, created_at, password='*********'):
